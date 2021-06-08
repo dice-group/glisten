@@ -1,6 +1,6 @@
 # How to contribute to Glisten
 
-Be aware of our Code of Conduct - we do not tolerate any discrimantive behaviour such as sexism, racism, antisemitism, ableism, homomysia ("phobia"), transmysia ("phobia"), or any other kind of harassment against people.
+Be aware of our Code of Conduct - we do not tolerate any discrimantive behaviour such as sexism, racism, antisemitism, ableism, homomysia ("phobia"), transmysia ("phobia"), or any other kind of harassment.
 
 # Found a Bug? 
 
