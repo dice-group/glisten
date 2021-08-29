@@ -18,6 +18,8 @@ object FactGenerator {
         falseStmtDrawer.init()
         taskDrawer.generateFalseStatements()
         taskDrawer.generateTrueStatements()
+        taskDrawer.task.statements.sortBy { it.second }
         return taskDrawer.task.statements
+
     }
 }

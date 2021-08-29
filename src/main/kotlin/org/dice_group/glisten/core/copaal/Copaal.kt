@@ -42,9 +42,9 @@ class Copaal {
                 qef,
                 2,
                 listOf(
-                    NamespaceFilter(rdf, false),
-                    NamespaceFilter(rdfs, false),
-                    NamespaceFilter(owl, false),
+                    NamespaceFilter(rdf, true),
+                    NamespaceFilter(rdfs, true),
+                    NamespaceFilter(owl, true),
                     EqualsFilter(filteredProperties)
                 )
             ),
@@ -54,10 +54,12 @@ class Copaal {
 
         //get the veracity value to a list
         val scores = facts.stream().map{
-            println("checking fact %s".format(it))
-            checker.check(it).veracityValue
+            print("[-] checking fact %s".format(it))
+            val ret = checker.check(it).veracityValue
+            println("\r[+] checking fact %s , score %f, normalized %f".format(it, ret, (ret+1)/2.0))
+            ret
         }.collect(Collectors.toList())
-        scores.sortByDescending { it }
+        //scores.sortByDescending { it }
         return getAUC(scores)
     }
 
@@ -65,8 +67,10 @@ class Copaal {
     private fun getAUC(scores: List<Double>) : Double{
         val roc = ROCCurve(0,0) // stmts doesn't matter
         roc.addPoint(0.0, 0.0)
+
         scores.forEachIndexed { i, value ->
-            roc.addPoint(i/(1.0*scores.size), value)
+            //TODO value_i+value_{i-1}???
+            roc.addPoint(i/(1.0*scores.size), (value+1)/2.0) // value in -1..1 so +1/2 is normalizing it
         }
         return roc.calculateAUC()
     }

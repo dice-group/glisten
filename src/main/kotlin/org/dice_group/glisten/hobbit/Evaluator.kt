@@ -148,9 +148,9 @@ class Evaluator : AbstractEvaluationModule() {
             //set correct datasets to add
             //currentDatasets.add(dataset)
             //get next point
+            println("[*] Current dataset to add %s".format(dataset))
             val score = getScore(facts, source, sourceModel, dataset)
-            println("Score: %f".format(score))
-            println("Current dataset to add %s".format(dataset))
+            println("[+] %s added, Score: %f".format(dataset, score))
             //FIXME make use of better functions addUP, ...
             roc.addPoint(counter/recommendations.size, score)
             counter += 1.0
@@ -172,7 +172,7 @@ class Evaluator : AbstractEvaluationModule() {
                 .removeSuffix(".nt") + "_" + currentDataset.substringAfterLast("/")
             val currentModel = RDFUtils.streamNoLiterals(linkdataset) //.read(FileInputStream(linkdataset), null, "NT")
             source.add(currentModel)
-            println("Current Model size: %d".format(source.size()))
+            println("[+] Current Model size: %d".format(source.size()))
         }        //}
         //Let Copaal run
         val copaal = Copaal()
