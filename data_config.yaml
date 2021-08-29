@@ -1,0 +1,16 @@
+configurations:
+  - name: "test_benchmark"
+    linksUrlZip: "file:///home/minimal/Documents/glisten_files/small/dbpedia_links_small.zip"
+    targetUrlZip: "file:///home/minimal/Documents/glisten_files/small/dbpedia_subsets_small.zip"
+    sources:
+      - "file:///home/minimal/Documents/glisten_files/small/FictionalCharacter.nt"
+    trueStmtDrawerOpt:
+      stmtDrawerType: "whitelist"
+      list:
+        - "http://dbpedia.org/ontology/mythology"
+        - "http://dbpedia.org/ontology/creator"
+    falseStmtDrawerOpt:
+      stmtDrawerType: "whitelist"
+      list:
+        - "http://dbpedia.org/ontology/mythology"
+        - "http://dbpedia.org/ontology/creator"

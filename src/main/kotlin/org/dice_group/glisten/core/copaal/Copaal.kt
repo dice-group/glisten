@@ -1,0 +1,69 @@
+package org.dice_group.glisten.core.copaal
+
+import org.aksw.jena_sparql_api.core.QueryExecutionFactory
+import org.aksw.jena_sparql_api.delay.core.QueryExecutionFactoryDelay
+import org.aksw.jena_sparql_api.model.QueryExecutionFactoryModel
+import org.aksw.jena_sparql_api.timeout.QueryExecutionFactoryTimeout
+import org.apache.jena.rdf.model.Model
+import org.apache.jena.rdf.model.Statement
+import org.dice_group.glisten.core.evaluation.ROCCurve
+import org.dice_research.fc.paths.PathBasedFactChecker
+import org.dice_research.fc.paths.PredicateFactory
+import org.dice_research.fc.paths.scorer.NPMIBasedScorer
+import org.dice_research.fc.paths.scorer.count.ApproximatingCountRetriever
+import org.dice_research.fc.paths.scorer.count.decorate.CachingCountRetrieverDecorator
+import org.dice_research.fc.paths.scorer.count.max.DefaultMaxCounter
+import org.dice_research.fc.paths.search.SPARQLBasedSOPathSearcher
+import org.dice_research.fc.sparql.filter.EqualsFilter
+import org.dice_research.fc.sparql.filter.NamespaceFilter
+import org.dice_research.fc.sum.FixedSummarist
+import java.util.concurrent.TimeUnit
+import java.util.stream.Collectors
+
+
+class Copaal {
+
+    val namespaceFilter = "http://dbpedia.org/ontology"
+
+    val filteredProperties =
+            arrayOf("http://dbpedia.org/ontology/wikiPageExternalLink", "http://dbpedia.org/ontology/wikiPageWikiLink")
+
+
+    fun factChecker(dataset: Model, facts: List<Statement>) : Double{
+        var qef: QueryExecutionFactory = QueryExecutionFactoryModel(dataset)
+        qef = QueryExecutionFactoryDelay(qef, 200L)
+        qef = QueryExecutionFactoryTimeout(qef, 30L, TimeUnit.SECONDS, 30L, TimeUnit.SECONDS)
+
+        val checker = PathBasedFactChecker(
+            PredicateFactory(qef),
+            SPARQLBasedSOPathSearcher(
+                qef,
+                2,
+                listOf(
+                    //NamespaceFilter(namespaceFilter, false),
+                    EqualsFilter(filteredProperties)
+                )
+            ),
+            NPMIBasedScorer(CachingCountRetrieverDecorator(ApproximatingCountRetriever(qef, DefaultMaxCounter(qef)))),
+            FixedSummarist()
+        )
+
+        //get the veracity value to a list
+        val scores = facts.stream().map{
+            println("checking fact %s".format(it))
+            checker.check(it).veracityValue
+        }.collect(Collectors.toList())
+        scores.sortByDescending { it }
+        return getAUC(scores)
+    }
+
+    //TODO make use of the better up/right/diagonally functions
+    private fun getAUC(scores: List<Double>) : Double{
+        val roc = ROCCurve(0,0) // stmts doesn't matter
+        roc.addPoint(0.0, 0.0)
+        scores.forEachIndexed { i, value ->
+            roc.addPoint(i/(1.0*scores.size), value)
+        }
+        return roc.calculateAUC()
+    }
+}
