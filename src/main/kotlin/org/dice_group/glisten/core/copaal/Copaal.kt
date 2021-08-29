@@ -23,7 +23,9 @@ import java.util.stream.Collectors
 
 class Copaal {
 
-    val namespaceFilter = "http://dbpedia.org/ontology"
+    val rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    val owl = "http://www.w3.org/2002/07/owl#"
+    val rdfs = "http://www.w3.org/2000/01/rdf-schema#"
 
     val filteredProperties =
             arrayOf("http://dbpedia.org/ontology/wikiPageExternalLink", "http://dbpedia.org/ontology/wikiPageWikiLink")
@@ -40,7 +42,9 @@ class Copaal {
                 qef,
                 2,
                 listOf(
-                    //NamespaceFilter(namespaceFilter, false),
+                    NamespaceFilter(rdf, false),
+                    NamespaceFilter(rdfs, false),
+                    NamespaceFilter(owl, false),
                     EqualsFilter(filteredProperties)
                 )
             ),

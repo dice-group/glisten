@@ -22,12 +22,14 @@ fun main(args: Array<String>){
     val conf = ConfigurationFactory.findCorrectConfiguration("test_benchmark")
     println("read config")
     //download all files
-    FileUtils.mkdirs("testing/links/")
-    FileUtils.mkdirs("testing/target/")
-    DownloadFiles.unzipFile(DownloadFiles.download(conf.linksUrlZip, "testing/"), "testing/links/")
+    if(!FileUtils.exists("testing")) {
+        FileUtils.mkdirs("testing/links/")
+        FileUtils.mkdirs("testing/target/")
+        DownloadFiles.unzipFile(DownloadFiles.download(conf.linksUrlZip, "testing/"), "testing/links/")
 
-    //we basically need the targets just for ordering.
-    DownloadFiles.unzipFile(DownloadFiles.download(conf.targetUrlZip, "testing/"), "testing/target/")
+        //we basically need the targets just for ordering.
+        DownloadFiles.unzipFile(DownloadFiles.download(conf.targetUrlZip, "testing/"), "testing/target/")
+    }
     //create random order (it really doesn't matter)
     val recommendations = mutableListOf<Pair<String, Double>>()
     File("testing/target/").listFiles()!!.forEach {
