@@ -13,29 +13,7 @@ import java.net.URL
 import kotlin.random.Random
 
 
-fun main(){
-    val b = Char(27)
-    //println("$b[33mERROR")
-    //println("${Char(27)}[34mTest")
-    var abc=""
-    var i =0
-    val printable = "Wherever you go, wherever you are, The Police is apparently watching you."
-    while (abc != printable) {
 
-        for(it in ("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXZY0123456789 ,.".toCharArray())) {
-            val new = abc+it
-            print("\r${Char(27)}[32;1m${new}")
-            Thread.sleep(10)
-            if(printable.startsWith(new)){
-                abc = new
-                break
-            }
-        }
-    }
-    println("${Char(27)}[39mTest")
-    //val model  =  RDFUtils.streamNoLiterals("file:///home/minimal/IdeaProjects/glisten/glisten/model.nt")
-    //println(model)
-}
 
 object RDFUtils {
 
