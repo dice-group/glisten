@@ -42,7 +42,7 @@ fun main(args: Array<String>){
     val evaluator = Evaluator()
     //avoid hobbit init
     evaluator.debug = true
-    evaluator.seed= 1234L
+    evaluator.seed= args[2].toLong()
     evaluator.maxPropertyLimit =30
     //TOP TEN
     evaluator.maxRecommendations=20
@@ -50,7 +50,10 @@ fun main(args: Array<String>){
     evaluator.numberOfTrueStatements=args[0].toInt()
     evaluator.numberOfFalseStatements=args[1].toInt()
 
+    print("[-] reading source 2 triplestore now")
     val sourceFile = conf.sources[0]
+    RDFUtils.loadVirtuoso(sourceFile)
+    println("\r[+] finished reading source 2 triplestore.")
 
     //create source model
     println("[+] reading source Model now")
@@ -62,18 +65,18 @@ fun main(args: Array<String>){
         evaluator.numberOfFalseStatements,
         conf.createTrueStmtDrawer(evaluator.seed, sourceModel, evaluator.minPropOcc, evaluator.maxPropertyLimit),
         conf.createFalseStmtDrawer(evaluator.seed, sourceModel, evaluator.minPropOcc, evaluator.maxPropertyLimit)
-    ).map { (stmt, d) -> stmt }
+    )
     println("\r[+] Done generating [%d positives, %d negative]facts. Facts are %s".format(evaluator.numberOfTrueStatements, evaluator.numberOfFalseStatements, facts))
-    calculateROC(evaluator, sourceFile, sourceModel, facts, recommendations)
+    calculateROC(evaluator, sourceFile, facts, recommendations)
     //evaluator.getAUC(sourceFile, recommendations)
 
 }
 
-fun calculateROC(evaluator: Evaluator, source: String, sourceModel: Model, facts: List<Statement>, recommendations: MutableList<Pair<String, Double>>){
-    val baseline = evaluator.getScore(facts, source, sourceModel, "")
-    println("[+] Baseline: %f".format(baseline))
+fun calculateROC(evaluator: Evaluator, source: String, facts: List<Pair<Statement, Double>>, recommendations: MutableList<Pair<String, Double>>){
+    val baseline = evaluator.getScore(facts, source, "")
+    println("\n[+] Baseline: %f".format(baseline))
     evaluator.linkedPath = File("testing/links/").absolutePath
-    val roc = evaluator.getROC(source, sourceModel, facts, recommendations)
+    val roc = evaluator.getROC(source, facts, recommendations)
     //y needs to get bigger.
     print(roc)
 

@@ -13,6 +13,7 @@ object FactGenerator {
     fun createFacts(seed: Long, numberOfTrueStatements: Int,  numberOfFalseStatements: Int,
                     trueStmtDrawer: StmtDrawer, falseStmtDrawer: StmtDrawer
                     ) : MutableList<Pair<Statement, Double>> {
+
         val taskDrawer = TaskDrawer(seed, numberOfTrueStatements, numberOfFalseStatements, trueStmtDrawer, falseStmtDrawer)
         trueStmtDrawer.init()
         falseStmtDrawer.init()

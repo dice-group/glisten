@@ -121,35 +121,29 @@ class Evaluator : AbstractEvaluationModule() {
             numberOfFalseStatements,
             conf!!.createTrueStmtDrawer(seed, sourceModel, minPropOcc, maxPropertyLimit),
             conf!!.createFalseStmtDrawer(seed, sourceModel, minPropOcc, maxPropertyLimit)
-        ).map { (stmt, d) -> stmt }
+        )
+
         //create baseline (w/o recommendations)
-        val baseline = getScore(facts, source, sourceModel, "")
+        val baseline = getScore(facts, source, "")
         val normalizer = 1.0/(1-baseline)
-        val roc = getROC(source, sourceModel, facts, recommendations)
+        val roc = getROC(source, facts, recommendations)
         return normalizer*(roc.calculateAUC()-baseline)
     }
 
 
-    fun getROC(source: String, sourceModel: Model, facts: List<Statement>, recommendations: MutableList<Pair<String, Double>>): ROCCurve{
+    fun getROC(source: String, facts: List<Pair<Statement, Double>>, recommendations: MutableList<Pair<String, Double>>): ROCCurve{
         recommendations.sortByDescending { it.second }
         //steps doesn't ,matter in our case, we don't know the first either way
         val roc = ROCCurve(0, recommendations.size)
 
         var counter=1.0
-        //val currentDatasets = mutableListOf<String>()
-        //for each recommendation create score and add to roc
-        //recommendations.forEach { (dataset, value) -> {
         for((dataset, value) in recommendations){
             if (counter>maxRecommendations && maxRecommendations!=-1){
                 //if maxRecom not -1 (disabling this check) and the the TOP N datasets were checked, break and return
                 return roc
             }
-
-            //set correct datasets to add
-            //currentDatasets.add(dataset)
-            //get next point
             println("[*] Current dataset to add %s".format(dataset))
-            val score = getScore(facts, source, sourceModel, dataset)
+            val score = getScore(facts, source, dataset)
             println("[+] %s added, Score: %f".format(dataset, score))
             //FIXME make use of better functions addUP, ...
             roc.addPoint(counter/recommendations.size, score)
@@ -159,7 +153,7 @@ class Evaluator : AbstractEvaluationModule() {
         return roc
     }
 
-    fun getScore(facts: List<Statement>, sourceName: String, source: Model, currentDataset: String) : Double{
+    fun getScore(facts: List<Pair<Statement, Double>>, sourceName: String, currentDataset: String) : Double{
         //create Model out of source and current datasets -> combinedDataset
         //val combinedDataset = ModelFactory.createDefaultModel()
         //combinedDataset.add(source)
@@ -170,13 +164,14 @@ class Evaluator : AbstractEvaluationModule() {
             //(Download is in init)
             val linkdataset = "file://$linkedPath/" + sourceName.substringAfterLast("/")
                 .removeSuffix(".nt") + "_" + currentDataset.substringAfterLast("/")
-            val currentModel = RDFUtils.streamNoLiterals(linkdataset) //.read(FileInputStream(linkdataset), null, "NT")
-            source.add(currentModel)
-            println("[+] Current Model size: %d".format(source.size()))
+            //val currentModel = RDFUtils.streamNoLiterals(linkdataset) //.read(FileInputStream(linkdataset), null, "NT")
+            //source.add(currentModel)
+            //println("[+] Current Model size: %d".format(source.size()))
+            RDFUtils.loadVirtuoso(linkdataset)
         }        //}
         //Let Copaal run
         val copaal = Copaal()
-        return copaal.factChecker(source, facts)
+        return copaal.factChecker("http://localhost:8890/sparql", facts)
     }
 
     override fun summarizeEvaluation(): Model {

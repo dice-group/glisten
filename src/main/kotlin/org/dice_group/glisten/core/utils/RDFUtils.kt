@@ -12,9 +12,6 @@ import org.apache.jena.shared.JenaException
 import java.net.URL
 import kotlin.random.Random
 
-
-
-
 object RDFUtils {
 
     fun streamNoLiterals(file: String) : Model{
@@ -40,6 +37,15 @@ object RDFUtils {
     fun removeNonURIObjects(model: Model?){
         val remove = model?.listStatements()?.toList()?.filter { it.`object`.isLiteral }
         model?.remove(remove)
+    }
+
+
+    fun loadVirtuoso(file: String){
+        var path = file.replace("file://", "")
+        path = path.substringBeforeLast("/")
+        val p = ProcessBuilder().command("./load_virtuoso.sh", path, file.substringAfterLast("/"))
+        p.inheritIO()
+        p.start().waitFor()
     }
 
 }
