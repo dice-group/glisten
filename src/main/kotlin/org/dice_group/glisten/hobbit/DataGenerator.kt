@@ -42,8 +42,7 @@ class DataGenerator : AbstractDataGenerator() {
     }
 
     private var benchmarkName = ""
-    private var systemQueue = "systemQueue"
-    private var tgQueue = "tgQueue"
+
     private var sourceUrls = emptyList<String>()
     private var targetUrl = ""
 
@@ -52,12 +51,6 @@ class DataGenerator : AbstractDataGenerator() {
         //get env <- benchmark name
         if(System.getenv().containsKey(CONSTANTS.BENCHMARK_NAME)){
             benchmarkName = System.getenv()[CONSTANTS.BENCHMARK_NAME]!!
-        }
-        if(System.getenv().containsKey(CONSTANTS.ONTOLOGY_2_TG_QUEUE_NAME)){
-            tgQueue = System.getenv()[CONSTANTS.ONTOLOGY_2_TG_QUEUE_NAME]!!
-        }
-        if(System.getenv().containsKey(CONSTANTS.ONTOLOGY_2_SYSTEM_QUEUE_NAME)){
-            systemQueue = System.getenv()[CONSTANTS.ONTOLOGY_2_SYSTEM_QUEUE_NAME]!!
         }
 
         //read config <- get sourceUrls and targetUrl from there, will throw exception if config doesn't exists, or benchmarkName doesn't exists in config.

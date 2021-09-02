@@ -22,7 +22,7 @@ target : URL.zip
 TrueStmtDrawer
 FalseStmtDrawer
  */
-class Configuration(){
+class Configuration{
     lateinit var name: String
     lateinit var sources: List<String>
     lateinit var targetUrlZip: String
@@ -74,6 +74,25 @@ class Configuration(){
         return createStmtDrawer(falseStmtDrawerOpt.getOrDefault(CONSTANTS.STMTDRAWER_TYPE, "whitelist" as Any).toString(),
             falseStmtDrawerOpt["list"] as Collection<String>, seed, model, minPropOcc, maxPropertyLimit
         )
+    }
+
+
+    override fun toString(): String {
+        return "$name : [$sources, $linksUrlZip, $targetUrlZip, $trueStmtDrawerOpt, $falseStmtDrawerOpt] "
+    }
+
+
+    override fun equals(other: Any?): Boolean {
+        if(other is Configuration){
+            var check = other.name == name
+            check = check && (other.sources == sources)
+            check = check && (other.linksUrlZip == linksUrlZip)
+            check = check && (other.targetUrlZip == targetUrlZip)
+            check = check && (other.falseStmtDrawerOpt == falseStmtDrawerOpt)
+            check = check && (other.trueStmtDrawerOpt == trueStmtDrawerOpt)
+            return check
+        }
+        return false
     }
 
 }
@@ -133,7 +152,7 @@ object ConfigurationFactory{
         } else if (config.name.endsWith(".json")) {
             return parse(config, JsonFactory())
         }
-        return Configurations()
+        throw ConfigurationLoadException("Couldn't guess if yaml or json from extension.")
     }
 
     /**

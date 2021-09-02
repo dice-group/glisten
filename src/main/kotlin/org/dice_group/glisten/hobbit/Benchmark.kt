@@ -98,10 +98,6 @@ class Benchmark : AbstractBenchmarkController() {
             noOfStatements = iterator.next().asLiteral().int
         }
 
-        //create modules , simply strg c str v
-        val ontToSystemQueueName = generateSessionQueueName("ontologyToSystemQueue")
-        val ontToTaskGeneratorQueueName = generateSessionQueueName("ontologyToTGQueue")
-
         // create TG Module
         createTaskGenerators(
             TASK_GENERATOR_CONTAINER_IMAGE, 1, arrayOf(
@@ -112,8 +108,6 @@ class Benchmark : AbstractBenchmarkController() {
         createDataGenerators(
             DATA_GENERATOR_CONTAINER_IMAGE, 1, arrayOf(
                 CONSTANTS.BENCHMARK_NAME + "=" + datasetName,
-                CONSTANTS.ONTOLOGY_2_TG_QUEUE_NAME + "=" + ontToTaskGeneratorQueueName,
-                CONSTANTS.ONTOLOGY_2_SYSTEM_QUEUE_NAME + "=" + ontToSystemQueueName
             )
         )
         LOGGER.info("Finished creating Data Generator")
