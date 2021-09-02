@@ -6,6 +6,7 @@ import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.Statement
 import org.apache.jena.riot.RIOT
 import org.dice_group.glisten.core.ConfigurationLoadException
+import org.dice_group.glisten.core.config.CONSTANTS
 import org.dice_group.glisten.core.config.Configuration
 import org.dice_group.glisten.core.config.ConfigurationFactory
 import org.dice_group.glisten.core.scorer.FactGenerator
@@ -90,7 +91,7 @@ class Test{
 
         print("[-] loading source into triplestore now")
         val sourceFile = conf.sources[0]
-        RDFUtils.loadTripleStoreFromScript(sourceFile)
+        RDFUtils.loadTripleStoreFromScript(sourceFile, CONSTANTS.SCRIPT_FILE)
         println("\r[+] finished loading source into triplestore.")
 
         //create source model for fact generation

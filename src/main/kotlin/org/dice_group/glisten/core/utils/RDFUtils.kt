@@ -36,21 +36,29 @@ object RDFUtils {
 
     /**
      * Loads a file into the triplestore using the load_triplestore.sh script.
-     * The script needs to be in the same folder as this was executed
-     * @param file the rdf file to load into the triplestore
+     * The script needs to be in the same folder as this was executed.
      *
-     * @throws FileNotFoundException if the ./load_triplestore.sh script file is not found.
+     * The rdffile should be set to URL syntax (meaning file://path/to/file.nt)
+     * However file.nt would also work as long as the file is in the local directory
+     *
+     * @param rdffile the rdf file to load into the triplestore (use URL syntax, aka file://..)
+     * @param scriptFile the script file to use to load the triplesotre
+     * @throws FileNotFoundException if the script file is not found.
      */
     @Throws(FileNotFoundException::class)
-    fun loadTripleStoreFromScript(file: String){
-        val scriptFile ="./load_triplestore.sh"
+    fun loadTripleStoreFromScript(rdffile: String, scriptFile: String){
         if(!File(scriptFile).exists()){
             throw FileNotFoundException("$scriptFile couldn't be located")
+        }
+        var file = rdffile
+        //simply set to current directory
+        if(!rdffile.contains("/")){
+            file = File(rdffile).absolutePath
         }
         //replace url schema file:// just in case
         var path = file.replace("file://", "")
         // we need to arguments the path and the filename,
-        path = path.substringBeforeLast("/")
+        path = path.substringBeforeLast("/")+"/"
         val p = ProcessBuilder().command(scriptFile, path, file.substringAfterLast("/"))
         //this will stop scripts from not returning after exit. some java bug i guess
         p.inheritIO()

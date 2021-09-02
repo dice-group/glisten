@@ -4,6 +4,7 @@ import net.lingala.zip4j.ZipFile
 import net.lingala.zip4j.exception.ZipException
 import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.rdf.model.Statement
+import org.dice_group.glisten.core.config.CONSTANTS
 import org.dice_group.glisten.core.config.Configuration
 import org.dice_group.glisten.core.scorer.Copaal
 import org.dice_group.glisten.core.scorer.FactGenerator
@@ -121,7 +122,7 @@ class CoreEvaluator(private val conf: Configuration, private val rdfEndpoint: St
             //(Download is in init)
             val linkdataset = "file://$linkedPath/" + sourceName.substringAfterLast("/")
                 .removeSuffix(".nt") + "_" + currentDataset.substringAfterLast("/")
-            RDFUtils.loadTripleStoreFromScript(linkdataset)
+            RDFUtils.loadTripleStoreFromScript(linkdataset, CONSTANTS.SCRIPT_FILE)
         }
         //Let the Scorer run
         val scorer = Copaal()
