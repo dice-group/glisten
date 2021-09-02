@@ -9,15 +9,8 @@ import java.util.stream.Collectors
 
 
 /**
- * mostly just copy paste svens code.
- * Don't know it don't care
- *
- * Eff this Fuser BS
- *
- *
- * Does somehting a long the line of merging nodes, for performance issues or similar.
- *
- * Honestly don't touch it, it's not worth it.
+ * Copied svens code, no idea what it does. It is not used in any way.
+ * So could as well be deleted.
  */
 object Fuser {
 

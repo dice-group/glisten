@@ -17,24 +17,19 @@
 package org.dice_group.glisten.hobbit
 
 import com.google.gson.JsonParser
-import net.lingala.zip4j.ZipFile
+import com.jamonapi.utils.FileUtils
 import org.apache.commons.math3.stat.StatUtils
 import org.apache.jena.rdf.model.*
 import org.apache.jena.vocabulary.RDF
 import org.dice_group.glisten.core.config.CONSTANTS
 import org.dice_group.glisten.core.config.Configuration
 import org.dice_group.glisten.core.config.ConfigurationFactory
-import org.dice_group.glisten.core.copaal.Copaal
-import org.dice_group.glisten.core.copaal.FactGenerator
-import org.dice_group.glisten.core.evaluation.ROCCurve
-import org.dice_group.glisten.core.utils.DownloadFiles
-import org.dice_group.glisten.core.utils.RDFUtils
+import org.dice_group.glisten.core.evaluation.CoreEvaluator
 import org.hobbit.core.components.AbstractEvaluationModule
 import org.hobbit.core.rabbit.RabbitMQUtils
 import org.hobbit.vocab.HOBBIT
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.net.URL
 
 
 class Evaluator : AbstractEvaluationModule() {
@@ -52,40 +47,43 @@ class Evaluator : AbstractEvaluationModule() {
     var minPropOcc = 10
     var maxPropertyLimit = 10
 
-    var debug = false
+    lateinit var coreEvaluator: CoreEvaluator
 
     override fun init() {
-        if(!debug) {
-            super.init()
-        }
+        super.init()
+
         var benchmarkName = ""
         if(System.getenv().containsKey(CONSTANTS.BENCHMARK_NAME)){
             benchmarkName = System.getenv()[CONSTANTS.BENCHMARK_NAME]!!
         }
         if(System.getenv().containsKey(CONSTANTS.NUMBER_OF_TRUE_STATEMENTS)){
-            seed = System.getenv()[CONSTANTS.NUMBER_OF_TRUE_STATEMENTS]!!.toLong()
+            numberOfTrueStatements = System.getenv()[CONSTANTS.NUMBER_OF_TRUE_STATEMENTS]!!.toInt()
         }
         if(System.getenv().containsKey(CONSTANTS.NUMBER_OF_FALSE_STATEMENTS)){
-            seed = System.getenv()[CONSTANTS.NUMBER_OF_FALSE_STATEMENTS]!!.toLong()
+            numberOfFalseStatements = System.getenv()[CONSTANTS.NUMBER_OF_FALSE_STATEMENTS]!!.toInt()
         }
         if(System.getenv().containsKey(CONSTANTS.MIN_PROP_OCC)){
-            seed = System.getenv()[CONSTANTS.MIN_PROP_OCC]!!.toLong()
+            minPropOcc = System.getenv()[CONSTANTS.MIN_PROP_OCC]!!.toInt()
         }
         if(System.getenv().containsKey(CONSTANTS.MAX_PROPERTY_LIMIT)){
-            seed = System.getenv()[CONSTANTS.MAX_PROPERTY_LIMIT]!!.toLong()
+            maxPropertyLimit = System.getenv()[CONSTANTS.MAX_PROPERTY_LIMIT]!!.toInt()
         }
-
+        if(System.getenv().containsKey(CONSTANTS.MAX_RECOMMENDATIONS)){
+            maxRecommendations = System.getenv()[CONSTANTS.MAX_RECOMMENDATIONS]!!.toInt()
+        }
         if(System.getenv().containsKey(CONSTANTS.SEED)){
             seed = System.getenv()[CONSTANTS.SEED]!!.toLong()
         }
-        conf = ConfigurationFactory.findCorrectConfiguration(benchmarkName)
-        //DOWNLOAD LINKS and unzip to /links/
-        val zipFile = DownloadFiles.download(conf?.linksUrlZip?:"", "/")
-        //val zipFile = "links.zip"
-        val linksZip = ZipFile(zipFile)
-        linksZip.extractAll("/links/")
-        //val linksZip = ZipFile(zipFile)
-        //linksZip.ex
+        //read config, if config doesn't exists or benchamarName is not in config will throw an exception
+        conf = ConfigurationFactory.findCorrectConfiguration(CONSTANTS.CONFIG_NAME, benchmarkName)
+        // create core evaluator using a standard virtuoso endpoint for now.
+        coreEvaluator = CoreEvaluator(conf!!, "http://localhost:8890/sparql")
+        FileUtils.mkdirs("/links/")
+        coreEvaluator.linkedPath="/links/"
+
+        //download zips and extract them
+        coreEvaluator.init("/")
+
     }
 
     override fun evaluateResponse(
@@ -95,13 +93,13 @@ class Evaluator : AbstractEvaluationModule() {
         responseReceivedTimestamp: Long
     ) {
         val recommendations = mutableListOf<Pair<String, Double>>()
-        // we get a recommendation array and basically no expected data ? < is that right?
+
         val recommendationJSON = JsonParser.parseString(RabbitMQUtils.readString(receivedData))
         recommendationJSON.asJsonArray.forEach{
             recommendations.add(Pair(it.asJsonObject.get("dataset").asString, it.asJsonObject.get("score").asDouble))
         }
         val source = RabbitMQUtils.readString(expectedData)
-        val auc = getAUC(source, recommendations)
+        val auc = coreEvaluator.getAUC(source, recommendations)
         aucList.add(auc)
         times.add(1.0*(responseReceivedTimestamp-taskSentTimestamp))
 
@@ -109,70 +107,6 @@ class Evaluator : AbstractEvaluationModule() {
 
 
 
-    fun getAUC(source: String, recommendations: MutableList<Pair<String, Double>>) : Double {
-        //create source model
-        val sourceModel = ModelFactory.createDefaultModel()
-        //download file
-        sourceModel.read(URL(source).openStream(), null, "NT")
-        //create facts for source model
-        // BE AWARE this changes sourceModel
-        val facts = FactGenerator.createFacts(seed,
-            numberOfTrueStatements,
-            numberOfFalseStatements,
-            conf!!.createTrueStmtDrawer(seed, sourceModel, minPropOcc, maxPropertyLimit),
-            conf!!.createFalseStmtDrawer(seed, sourceModel, minPropOcc, maxPropertyLimit)
-        )
-
-        //create baseline (w/o recommendations)
-        val baseline = getScore(facts, source, "")
-        val normalizer = 1.0/(1-baseline)
-        val roc = getROC(source, facts, recommendations)
-        return normalizer*(roc.calculateAUC()-baseline)
-    }
-
-
-    fun getROC(source: String, facts: List<Pair<Statement, Double>>, recommendations: MutableList<Pair<String, Double>>): ROCCurve{
-        recommendations.sortByDescending { it.second }
-        //steps doesn't ,matter in our case, we don't know the first either way
-        val roc = ROCCurve(0, recommendations.size)
-
-        var counter=1.0
-        for((dataset, value) in recommendations){
-            if (counter>maxRecommendations && maxRecommendations!=-1){
-                //if maxRecom not -1 (disabling this check) and the the TOP N datasets were checked, break and return
-                return roc
-            }
-            println("[*] Current dataset to add %s".format(dataset))
-            val score = getScore(facts, source, dataset)
-            println("[+] %s added, Score: %f".format(dataset, score))
-            //FIXME make use of better functions addUP, ...
-            roc.addPoint(counter/recommendations.size, score)
-            counter += 1.0
-        }
-
-        return roc
-    }
-
-    fun getScore(facts: List<Pair<Statement, Double>>, sourceName: String, currentDataset: String) : Double{
-        //create Model out of source and current datasets -> combinedDataset
-        //val combinedDataset = ModelFactory.createDefaultModel()
-        //combinedDataset.add(source)
-        //currentDatasets.forEach{
-            //var currentModel = ModelFactory.createDefaultModel()
-            //FIXME
-        if(currentDataset.isNotEmpty()) {
-            //(Download is in init)
-            val linkdataset = "file://$linkedPath/" + sourceName.substringAfterLast("/")
-                .removeSuffix(".nt") + "_" + currentDataset.substringAfterLast("/")
-            //val currentModel = RDFUtils.streamNoLiterals(linkdataset) //.read(FileInputStream(linkdataset), null, "NT")
-            //source.add(currentModel)
-            //println("[+] Current Model size: %d".format(source.size()))
-            RDFUtils.loadVirtuoso(linkdataset)
-        }        //}
-        //Let Copaal run
-        val copaal = Copaal()
-        return copaal.factChecker("http://localhost:8890/sparql", facts)
-    }
 
     override fun summarizeEvaluation(): Model {
         LOGGER.info("Summarizing Results")
@@ -184,9 +118,7 @@ class Evaluator : AbstractEvaluationModule() {
         val maxTime = StatUtils.max(timeAsDouble)
         val avgTime = StatUtils.mean(timeAsDouble)
         val sumTime = StatUtils.sum(timeAsDouble)
-        //val firstPercentileTime = StatUtils.percentile(timeAsDouble, 25.0)
-        //val secondPercentileTime = StatUtils.percentile(timeAsDouble, 50.0)
-        //val thirdPercentileTime = StatUtils.percentile(timeAsDouble, 75.0)
+
 
         LOGGER.info("Creating model with [average AUC: {}, mean Time MS: {}, min Time MS: {}, max Time MS: {}]",
             avgAUC, avgTime, minTime, maxTime)

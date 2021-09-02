@@ -60,8 +60,8 @@ class DataGenerator : AbstractDataGenerator() {
             systemQueue = System.getenv()[CONSTANTS.ONTOLOGY_2_SYSTEM_QUEUE_NAME]!!
         }
 
-        //read config <- get sourceUrls and targetUrl from there
-        val config = ConfigurationFactory.findCorrectConfiguration(benchmarkName)
+        //read config <- get sourceUrls and targetUrl from there, will throw exception if config doesn't exists, or benchmarkName doesn't exists in config.
+        val config = ConfigurationFactory.findCorrectConfiguration(CONSTANTS.CONFIG_NAME, benchmarkName)
         sourceUrls = config.sources
         targetUrl = config.targetUrlZip
         //send TargetURL (zip to system)

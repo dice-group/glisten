@@ -11,8 +11,9 @@ import kotlin.collections.HashSet
 
 /**
  * Code is shamelessly stolen from sven and just converted to Kotlin and adjusted for glisten.
+ * Hence I didn't write any doc for it.
  */
-class TaskDrawer(private val seed: Long, private val numberOfTrueStatements: Int, private val numberOfFalseStatements: Int, private val trueStmtDrawer: StmtDrawer, private val falseStmtDrawer: StmtDrawer ) {
+class TaskDrawer(seed: Long, private val numberOfTrueStatements: Int, private val numberOfFalseStatements: Int, private val trueStmtDrawer: StmtDrawer, private val falseStmtDrawer: StmtDrawer ) {
 
     private val random = Random(seed)
 
@@ -57,8 +58,8 @@ class TaskDrawer(private val seed: Long, private val numberOfTrueStatements: Int
         while (stmts.size < numberOfFalseStatements && falseStmtDrawer.hasStatement()) {
             try {
                 val stmt: Statement = falseStmtDrawer.drawRandomStmt()
-                getObjectsOfProperty(stmt, falseStmtDrawer.model)?.let { randomObjectReplacement(stmt, it) }
-                    ?.let { stmts.add(it) }
+                randomObjectReplacement(stmt, getObjectsOfProperty(stmt, falseStmtDrawer.model))
+                    .let { stmts.add(it) }
             } catch (noObjectOfClass: IllegalArgumentException) {
                 LOGGER.debug("no Object in Class to replace")
             } catch (noStmtCanBeDrawn: IndexOutOfBoundsException) {
@@ -71,11 +72,11 @@ class TaskDrawer(private val seed: Long, private val numberOfTrueStatements: Int
 
 
     /**@return List of Objects of this property in the model.
-     * Excluding those which habe the same subject as the provided statement.
+     * Excluding those which have the same subject as the provided statement.
      */
-    private fun getObjectsOfProperty(stmt: Statement, model: Model): List<Resource?>? {
-        val objects: Set<Resource>? = getObjects(stmt.getPredicate(), model)
-        return withoutExistingStatements(stmt.getSubject(), stmt.getPredicate(), objects, model)
+    private fun getObjectsOfProperty(stmt: Statement, model: Model): List<Resource?> {
+        val objects: Set<Resource>? = getObjects(stmt.predicate, model)
+        return withoutExistingStatements(stmt.subject, stmt.predicate, objects, model)
     }
 
     @Throws(java.lang.IllegalArgumentException::class)
@@ -89,7 +90,7 @@ class TaskDrawer(private val seed: Long, private val numberOfTrueStatements: Int
         if (!stmtObjectMap!!.containsKey(predicate.toString())) {
             val objects: Set<Resource> = model.listStatements(null, predicate, null as RDFNode?)
                 .mapWith { s -> s.getObject().asResource() }.toSet()
-            if (objects == null || objects.isEmpty()) {
+            if (objects.isEmpty()) {
                 println("what")
             }
             stmtObjectMap!![predicate.toString()] = objects
@@ -105,9 +106,9 @@ class TaskDrawer(private val seed: Long, private val numberOfTrueStatements: Int
         predicate: Property,
         objects: Set<Resource>?,
         model: Model
-    ): List<Resource?>? {
+    ): List<Resource?> {
         val without: MutableList<Resource?> = ArrayList()
-        if (!objects!!.isEmpty()) {
+        if (objects!!.isNotEmpty()) {
             for (`object`: Resource in objects) {
                 if (!model.contains(subject, predicate, `object`)) {
                     without.add(`object`)

@@ -18,10 +18,10 @@ package org.dice_group.glisten.core.config
 
 object CONSTANTS {
 
+    const val MAX_RECOMMENDATIONS = "maxRecommendations"
     const val STMTDRAWER_TYPE = "stmtDrawerType"
     const val NUMBER_OF_STATEMENTS = "numberOfStatements"
     const val SEED = "seed"
-    const val PRE_GENERATE_TASKS = "preGenerate"
     const val CONFIG_NAME = "data_config.yaml"
     const val ONTOLOGY_2_SYSTEM_QUEUE_NAME = "queue2System"
     const val ONTOLOGY_2_TG_QUEUE_NAME = "queue2TaskGenerator"
