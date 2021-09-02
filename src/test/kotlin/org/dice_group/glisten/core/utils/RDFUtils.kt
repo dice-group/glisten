@@ -3,8 +3,6 @@ package org.dice_group.glisten.core.utils
 import org.apache.commons.io.FileUtils
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
-import org.apache.jena.rdf.model.ResourceFactory
-import org.junit.After
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.io.File

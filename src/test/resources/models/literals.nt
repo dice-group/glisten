@@ -1,0 +1,11 @@
+<http://example.com/res/1> <http://example.com/prop/1> "abc"@de .
+<http://example.com/res/1> <http://example.com/prop/1> _:abc .
+<http://example.com/res/2> <http://example.com/prop/2> "1"^^<http://my-datatype.com> .
+<http://example.com/res/3> <http://example.com/prop/1> "abc" .
+<http://example.com/res/4> <http://example.com/prop/1> "true"^^<http://example.com> .
+<http://example.com/res/8> <http://example.com/prop/1> <https://example.com1> .
+<http://example.com/res/5> <http://example.com/prop/2> "abc tester" .
+<http://example.com/res/6> <http://example.com/prop/1> "abc"@fr .
+<http://example.com/res/7> <http://example.com/prop/3> "1.000" .
+<http://example.com/res/3> <http://example.com/prop/2> <https://example.com2> .
+
