@@ -9,7 +9,7 @@ class BlockListDrawer(private val blockList: Collection<String>, private val see
         val ret = mutableListOf<Statement>()
         //get all statements
         val stmts =  model.listStatements().mapWith { stmt -> stmt.predicate.toString() }.toSet()
-        //remove blacklists
+        //remove blocklists
         stmts.removeAll(blockList)
         stmts.forEach{
             ret.addAll(super.getStmts(it))

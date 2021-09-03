@@ -53,11 +53,15 @@ class Test{
     @CommandLine.Option(names = ["-nofs", "--no-of-false-stmts"], description = ["the no. of false statements to generate. Default=5"])
     var numberOfFalseStatements = 5;
 
-    @CommandLine.Option(names=["-e", "--endpoint"], description = ["the no. of false statements to generate. Default=5"])
+    @CommandLine.Option(names=["-e", "--endpoint"], description = ["the rdf endpoint to use"])
     lateinit var rdfEndpoint : String
 
     @CommandLine.Option(names = ["-c", "--config"], description = ["the config file for glisten. Default: data_config.yml"])
     var configFile = "data_config.yml"
+
+    @CommandLine.Option(names = ["-o", "--order-file"], description = ["A file containing the order of the recommendations, if not set, will be random"])
+    var orderFile = ""
+
 
     @CommandLine.Option(names = ["--clean-up"], description = ["if set, will "])
     var cleanUp = false
@@ -83,8 +87,13 @@ class Test{
             recommendations.add(Pair(it.absolutePath, 1.0))
         }
 
-        //create random order (it really doesn't matter tbh)
-        recommendations.shuffle(Random(seed))
+
+        if(orderFile.isEmpty()) {
+            //create random order (it really doesn't matter tbh)
+            recommendations.shuffle(Random(seed))
+        }else{
+            orderRecommendations(recommendations, orderFile)
+        }
 
         //Set parameters
         val evaluator = createEvaluator(conf)
@@ -107,6 +116,28 @@ class Test{
             print("[-] Removing testing directory now.")
             FileUtils.delete("testing/")
             println("\r[+] Deleted testing directory.")
+        }
+    }
+
+    /**
+     * Will order the recommendations according to the order file
+     *
+     * Each file in the recommendations needs to be in the order file and each file per line
+     */
+    private fun orderRecommendations(recommendations: MutableList<Pair<String, Double>>, orderFile: String) {
+        //create order map for lookup
+        val orderMap = mutableMapOf<String, Int>()
+        org.apache.commons.io.FileUtils.readLines(File(orderFile)).forEachIndexed { index, s -> orderMap[s] = index }
+        try   {
+        recommendations.sortWith(Comparator { recom1, recom2 ->
+            orderMap[recom1.first.substringAfterLast("/")]!!.compareTo(
+                orderMap[recom2.first.substringAfterLast("/")]!!
+            )
+        })
+        }catch(e : Exception){
+            //if the order doesn't contain a string
+            //just ignore the ordering
+            System.err.println("Order file is incomplete. Will use native file reading order.")
         }
     }
 
