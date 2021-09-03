@@ -1,6 +1,8 @@
 package org.dice_group.glisten.core.config
 
 import com.fasterxml.jackson.core.JsonFactory
+import com.fasterxml.jackson.core.JsonParseException
+import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import org.apache.jena.rdf.model.Model
@@ -9,6 +11,7 @@ import org.dice_group.glisten.core.task.drawer.BlackListDrawer
 import org.dice_group.glisten.core.task.drawer.StmtDrawer
 import org.dice_group.glisten.core.task.drawer.WhiteListDrawer
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.IOException
 import java.util.*
 
@@ -29,6 +32,7 @@ class Configuration{
     lateinit var linksUrlZip: String
     lateinit var trueStmtDrawerOpt: Map<String, Any>
     lateinit var falseStmtDrawerOpt: Map<String, Any>
+    lateinit var namespaces: List<String>
 
     private fun createStmtDrawer(type: String, list: Collection<String>, seed: Long, model: Model, minPropOcc: Int, maxPropertyLimit: Int  ): StmtDrawer {
         return if( type.lowercase(Locale.getDefault()) == "whitelist"){
@@ -78,7 +82,7 @@ class Configuration{
 
 
     override fun toString(): String {
-        return "$name : [$sources, $linksUrlZip, $targetUrlZip, $trueStmtDrawerOpt, $falseStmtDrawerOpt] "
+        return "$name : [$sources, $linksUrlZip, $targetUrlZip, $trueStmtDrawerOpt, $falseStmtDrawerOpt, $namespaces] "
     }
 
 
@@ -90,6 +94,7 @@ class Configuration{
             check = check && (other.targetUrlZip == targetUrlZip)
             check = check && (other.falseStmtDrawerOpt == falseStmtDrawerOpt)
             check = check && (other.trueStmtDrawerOpt == trueStmtDrawerOpt)
+            check = check && (other.namespaces == namespaces)
             return check
         }
         return false
@@ -115,7 +120,7 @@ object ConfigurationFactory{
      *
      * @param configurationsFile The File name containing all configurations
      * @param benchmarkName The name of the benchmark to get the configuration for
-     * @return the
+     * @return the configuration mapped to the benchmarkName
      */
     @kotlin.jvm.Throws(ConfigurationLoadException::class)
     fun findCorrectConfiguration(configurationsFile: String, benchmarkName: String): Configuration{
@@ -128,11 +133,18 @@ object ConfigurationFactory{
                     return it
                 }
             }
-        }catch(e: IOException){
+            System.err.println("Couldn't find benchmark Config with name {}".format(benchmarkName))
+        }catch (e: IOException){
+            e.printStackTrace()
+            System.err.println("Couldn't find config file $configurationsFile")
+        }catch (e: JsonParseException){
+            System.err.println("Config file is not valid json/yaml")
+            e.printStackTrace()
+        }catch (e: JsonMappingException){
+            System.err.println("Config file cannot be mapped to the Configuration objects")
             e.printStackTrace()
         }
-        System.err.println("Couldn't find benchmark Config with name {}".format(benchmarkName))
-        throw ConfigurationLoadException("Couldn't find Configuration")
+        throw ConfigurationLoadException("Configuration couldn't be loaded properly")
     }
 
 
@@ -143,9 +155,10 @@ object ConfigurationFactory{
      * @param config The File containing the configurations
      * @return The Configurations object containing all configurations.
      * @throws IOException if the file couldn't be read or doesn't exists
-     *
+     * @throws JsonParseException If the file is not in json or Yaml format
+     * @throws JsonMappingException If the json/yaml file cannot be mapped to the configuration
      */
-    @Throws(IOException::class)
+    @Throws(IOException::class, JsonParseException::class, JsonMappingException::class)
     fun create(config: File): Configurations {
         if (config.name.endsWith(".yml") || config.name.endsWith(".yaml")) {
             return parse(config, YAMLFactory())
@@ -158,7 +171,7 @@ object ConfigurationFactory{
     /**
      * Will use an ObjectMapper to parse the configuration file and a JSONFactory
      */
-    @Throws(IOException::class)
+    @Throws(IOException::class, JsonParseException::class, JsonMappingException::class)
     private fun parse(config: File, factory: JsonFactory) : Configurations {
         val mapper = ObjectMapper(factory)
         return mapper.readValue(config, Configurations::class.java)

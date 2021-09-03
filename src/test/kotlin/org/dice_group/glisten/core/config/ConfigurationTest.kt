@@ -1,5 +1,7 @@
 package org.dice_group.glisten.core.config
 
+import com.fasterxml.jackson.core.JsonParseException
+import com.fasterxml.jackson.databind.JsonMappingException
 import org.apache.jena.rdf.model.ModelFactory
 import org.dice_group.glisten.core.ConfigurationLoadException
 import org.dice_group.glisten.core.task.drawer.BlackListDrawer
@@ -11,6 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.IOException
 import java.util.stream.Stream
 import kotlin.test.assertContains
@@ -26,6 +29,7 @@ class ConfigurationTest {
     fun `load all configurations and check if size eq 3 and benchmark1, benchmark2 and actualBenchmark are the names of the benchmarks`(){
         assertThrows<ConfigurationLoadException>{  ConfigurationFactory.create(File("doesntexists")) }
         assertThrows<IOException>{  ConfigurationFactory.create(File("doesntexists.yaml")) }
+        assertThrows<JsonMappingException>{  ConfigurationFactory.create(File("src/test/resources/configs/wrong.yaml")) }
 
         val confs = ConfigurationFactory.create(File("src/test/resources/configs/simple.yaml"))
         assertEquals(3, confs.configurations.size, "Configuration size is not correct")
@@ -90,6 +94,7 @@ class ConfigurationTest {
             conf.sources = arrayListOf(name+"_1", name+"_2", name+"_3")
             conf.falseStmtDrawerOpt = mapOf(Pair("stmtDrawerType", "whitelist"), Pair("list", arrayListOf(name)))
             conf.trueStmtDrawerOpt  = mapOf(Pair("stmtDrawerType", "blacklist"), Pair("list", arrayListOf(name)))
+            conf.namespaces = listOf("${name}_1", "${name}_2")
             return conf
         }
 
@@ -111,7 +116,10 @@ class ConfigurationTest {
             Arguments.of("src/test/resources/configs/simple.yaml", "benchmark1", createConfiguration("benchmark1"), true),
             Arguments.of("src/test/resources/configs/simple.yaml", "benchmark2", createConfiguration("benchmark2"), true),
             //shouldn't exists
-            Arguments.of("src/test/resources/configs/simple.yaml", "doesntexists", createConfiguration("doesntexists"), false)
+            Arguments.of("src/test/resources/configs/simple.yaml", "doesntexists", createConfiguration("doesntexists"), false),
+            Arguments.of("src/test/resources/configs/wrong.yaml", "irrelevant", createConfiguration("irrelevant"), false),
+            Arguments.of("src/test/resources/configs/not.yaml", "irrelevant", createConfiguration("irrelevant"), false)
+
         )
     }
 

@@ -1,10 +1,6 @@
 package org.dice_group.glisten.core.evaluation
 
-class Point(x: Double =0.0, y: Double =0.0) {
-
-
-    var x = 0.0
-    var y = 0.0
+class Point(var x: Double =0.0, var y: Double =0.0) {
 
 
     fun setLocation(x: Double, y: Double) {
@@ -16,5 +12,13 @@ class Point(x: Double =0.0, y: Double =0.0) {
         val builder = StringBuilder()
         builder.append("[ x : ").append(x).append(", y : ").append(y).append(" ]")
         return builder.toString()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if(other is Point){
+            return other.x == other.x &&
+                    other.y == other.y
+        }
+        return false
     }
 }

@@ -125,7 +125,7 @@ class CoreEvaluator(private val conf: Configuration, private val rdfEndpoint: St
             RDFUtils.loadTripleStoreFromScript(linkdataset, CONSTANTS.SCRIPT_FILE)
         }
         //Let the Scorer run
-        val scorer = Copaal()
+        val scorer = Copaal(conf.namespaces)
         return scorer.getScore(rdfEndpoint, facts)
     }
 

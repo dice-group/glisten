@@ -21,13 +21,9 @@ import java.util.concurrent.TimeUnit
 
 
 
-class Copaal : Scorer{
+class Copaal(namespaces: List<String>) : Scorer(namespaces){
 
-
-    val rdf: String = RDF.getURI() // "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-
-
-    private fun createFactChecker(endpoint: String): IFactChecker{
+    private fun createFactChecker(endpoint: String, namespaces: List<String>): IFactChecker{
         var qef : QueryExecutionFactory = QueryExecutionFactoryHttp(endpoint)
         qef = QueryExecutionFactoryDelay(qef, 200L)
         qef = QueryExecutionFactoryTimeout(qef, 30L, TimeUnit.SECONDS, 30L, TimeUnit.SECONDS)
@@ -38,7 +34,7 @@ class Copaal : Scorer{
                 qef,
                 3,
                 listOf(
-                    NamespaceFilter(listOf("http://dbpedia.org/ontology","http://dbpedia.org/properties"))
+                    NamespaceFilter(namespaces)
                 )
             ),
             NPMIBasedScorer(CachingCountRetrieverDecorator(PropPathBasedPairCountRetriever(qef, DefaultMaxCounter(qef)))),
@@ -48,7 +44,7 @@ class Copaal : Scorer{
 
     override fun getScores(endpoint: String, facts: List<Pair<Statement, Double>>) : MutableList<Pair<Double, Double>>{
         //create the fact checker
-        val checker = createFactChecker(endpoint)
+        val checker = createFactChecker(endpoint, namespaces)
 
         //calculate scores
         val scores = mutableListOf<Pair<Double, Double>>()
@@ -77,16 +73,17 @@ class Copaal : Scorer{
 class NamespaceFilter(private val namespaces: List<String>) : IRIFilter{
 
     override fun addFilter(variableName: String, queryBuilder: StringBuilder) {
+        if(namespaces.isNotEmpty()) {
+            queryBuilder.append(" FILTER(")
 
-        queryBuilder.append(" FILTER(")
+            for (i in 0 until namespaces.size - 1) {
+                queryBuilder.append("strstarts(str(?").append(variableName).append("),\"")
+                    .append(namespaces[i]).append("\") || ")
 
-        for (i in 0 until namespaces.size-1){
+            }
             queryBuilder.append("strstarts(str(?").append(variableName).append("),\"")
-                .append(namespaces[i]).append("\") || ")
-
+                .append(namespaces.last()).append("\")) \n")
         }
-        queryBuilder.append("strstarts(str(?").append(variableName).append("),\"")
-            .append(namespaces.last()).append("\")) \n")
     }
 
 }

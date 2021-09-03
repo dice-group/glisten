@@ -4,9 +4,9 @@ import org.apache.jena.rdf.model.Statement
 import org.dice_group.glisten.core.evaluation.ROCCurve
 
 /**
- * The scorer/fact checker interface to use if you want to use something else than Copaal
+ * The scorer/fact checker interface to use if you want to use something else than Copaal.
  */
-interface Scorer {
+abstract class Scorer(val namespaces: List<String>) {
 
 
     /**
@@ -45,7 +45,7 @@ interface Scorer {
      *
      * @return a list of pairs containing the trueness value of the fact and the score
      */
-    fun getScores(endpoint: String, facts: List<Pair<Statement, Double>>): MutableList<Pair<Double, Double>>
+    abstract fun getScores(endpoint: String, facts: List<Pair<Statement, Double>>): MutableList<Pair<Double, Double>>
 
     /**
      * AUC helper function which will create a ROC curve and calculates its AUC.

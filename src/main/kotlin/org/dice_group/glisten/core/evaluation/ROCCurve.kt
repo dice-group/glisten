@@ -1,7 +1,7 @@
 package org.dice_group.glisten.core.evaluation
 
-private enum class DIRECTION{
-    UP, RIGHT, DIAGONALLY
+enum class DIRECTION{
+    UP, RIGHT
 }
 
 /**
@@ -9,7 +9,7 @@ private enum class DIRECTION{
  *
  * Shamelessy stolen from gerbil KBC
  */
-class ROCCurve(val trueStmts: Int, val falseStmts: Int) {
+class ROCCurve(private val trueStmts: Int, private val falseStmts: Int) {
 
     private val points = mutableListOf<Point>()
 
@@ -29,8 +29,7 @@ class ROCCurve(val trueStmts: Int, val falseStmts: Int) {
     }
 
     fun addPoint(x: Double, y: Double){
-        val newPoint = Point(0.0, 0.0)
-        newPoint.setLocation(x, y)
+        val newPoint = Point(x, y)
         points.add(newPoint)
     }
 
@@ -39,8 +38,7 @@ class ROCCurve(val trueStmts: Int, val falseStmts: Int) {
      */
     fun addUp() {
         ++upStepsCount
-        var newY = 0.0
-        newY = if (upStepsCount >= trueStmts) {
+        val newY = if (upStepsCount >= trueStmts) {
             // We want to end up at 1.0 so simply add it instead of trying to
             // calculate it
             // and end up with 0.999...
@@ -61,7 +59,7 @@ class ROCCurve(val trueStmts: Int, val falseStmts: Int) {
      */
     private fun addUp(newY: Double) {
         var lastX = 0.0
-        if (!points.isEmpty()) {
+        if (points.isNotEmpty()) {
             val last = points[points.size - 1]
             lastX = last.x
             if (DIRECTION.UP == lastDir) {
@@ -79,9 +77,8 @@ class ROCCurve(val trueStmts: Int, val falseStmts: Int) {
      * Adds a new point to the curve by going one step right.
      */
     fun addRight() {
-        val newX: Double
         ++rightStepsCount
-        newX = if (rightStepsCount >= falseStmts) {
+        val newX = if (rightStepsCount >= falseStmts) {
             // We want to end up at 1.0 so simply add it instead of trying to
             // calculate it
             // and end up with 0.999...
@@ -102,7 +99,7 @@ class ROCCurve(val trueStmts: Int, val falseStmts: Int) {
      */
     private fun addRight(newX: Double) {
         var lastY = 0.0
-        if (!points.isEmpty()) {
+        if (points.isNotEmpty()) {
             val last = points[points.size - 1]
             lastY = last.y
             if (DIRECTION.RIGHT == lastDir) {
@@ -116,38 +113,19 @@ class ROCCurve(val trueStmts: Int, val falseStmts: Int) {
     }
 
 
-    fun addDiagonally(stepsUp: Int, stepsRight: Int) {
-        // If we start with a triangle we have to add (0,0)
-        val last: Point
-        if (points.isEmpty()) {
-            last = Point(0.0, 0.0)
-            points.add(last)
-        } else {
-            last = points[points.size - 1]
+    /**
+     * finalize the curve by adding the last point to 1.0/1.0 if it's not existing
+     * this allows calculating AUC scores for ROC curves build soley on true statements.
+     */
+    private fun finalize(){
+        val lastPoint = points.last()
+        if(lastPoint.x != 1.0 || lastPoint.y != 1.0){
+            points.add(Point(1.0, 1.0))
         }
-        var x = 0.0
-        rightStepsCount += stepsRight
-        x = if (rightStepsCount >= falseStmts) {
-            // We want to end up at 1.0 so simply add it instead of trying to
-            // calculate it and end up with 0.999...
-            1.0
-        } else {
-            last.x + stepsRight * stepLengthRight
-        }
-        var y = 0.0
-        upStepsCount += stepsUp
-        y = if (upStepsCount >= trueStmts) {
-            // We want to end up at 1.0 so simply add it instead of trying to
-            // calculate it and end up with 0.999...
-            1.0
-        } else {
-            last.y + stepsUp * stepLengthUp
-        }
-        points.add(Point(x, y))
-        lastDir = DIRECTION.DIAGONALLY
     }
 
     fun calculateAUC(): Double {
+        finalize()
         var auc = 0.0
         var aup: Double
         var pointA: Point
@@ -171,5 +149,14 @@ class ROCCurve(val trueStmts: Int, val falseStmts: Int) {
             }
         }
         return auc
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other is ROCCurve){
+            return other.points == points &&
+                    other.trueStmts == trueStmts &&
+                    other.falseStmts == falseStmts
+        }
+        return false
     }
 }
