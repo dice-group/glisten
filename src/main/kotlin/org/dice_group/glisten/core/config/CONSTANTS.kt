@@ -24,8 +24,6 @@ object CONSTANTS {
     const val NUMBER_OF_STATEMENTS = "numberOfStatements"
     const val SEED = "seed"
     const val CONFIG_NAME = "data_config.yaml"
-    const val ONTOLOGY_2_SYSTEM_QUEUE_NAME = "queue2System"
-    const val ONTOLOGY_2_TG_QUEUE_NAME = "queue2TaskGenerator"
     const val BENCHMARK_NAME = "benchmarkName"
     const val GLISTEN_PREFIX = "http://w3id.org/glisten/hobbit/vocab#"
     const val NUMBER_OF_TRUE_STATEMENTS = "noOfTrueStmts"

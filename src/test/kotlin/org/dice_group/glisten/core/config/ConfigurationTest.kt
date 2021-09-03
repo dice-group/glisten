@@ -1,11 +1,10 @@
 package org.dice_group.glisten.core.config
 
-import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
 import org.apache.jena.rdf.model.ModelFactory
 import org.dice_group.glisten.core.ConfigurationLoadException
-import org.dice_group.glisten.core.task.drawer.BlackListDrawer
-import org.dice_group.glisten.core.task.drawer.WhiteListDrawer
+import org.dice_group.glisten.core.task.drawer.BlockListDrawer
+import org.dice_group.glisten.core.task.drawer.AllowListDrawer
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -13,7 +12,6 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
-import java.io.FileNotFoundException
 import java.io.IOException
 import java.util.stream.Stream
 import kotlin.test.assertContains
@@ -45,21 +43,21 @@ class ConfigurationTest {
     @Order(2)
     fun `given a configuration, it should generate the correct statement drawers`(
         conf: Configuration,
-        trueTypeIsWhitelist: Boolean,
-        falseTypeIsWhitelist: Boolean
+        trueTypeIsAllowList: Boolean,
+        falseTypeIsAllowList: Boolean
     ){
         val trueStmtDrawer = conf.createTrueStmtDrawer(123, ModelFactory.createDefaultModel(), 12, 12)
         val falseStmtDrawer = conf.createFalseStmtDrawer(123, ModelFactory.createDefaultModel(), 12, 12)
         // type correct
-        if(trueTypeIsWhitelist){
-            assertIs<WhiteListDrawer>(trueStmtDrawer)
+        if(trueTypeIsAllowList){
+            assertIs<AllowListDrawer>(trueStmtDrawer)
         }else{
-            assertIs<BlackListDrawer>(trueStmtDrawer)
+            assertIs<BlockListDrawer>(trueStmtDrawer)
         }
-        if(falseTypeIsWhitelist){
-            assertIs<WhiteListDrawer>(falseStmtDrawer)
+        if(falseTypeIsAllowList){
+            assertIs<AllowListDrawer>(falseStmtDrawer)
         }else{
-            assertIs<BlackListDrawer>(falseStmtDrawer)
+            assertIs<BlockListDrawer>(falseStmtDrawer)
         }
         // the list is correctly read
 
@@ -92,8 +90,8 @@ class ConfigurationTest {
             conf.linksUrlZip = "https://${name}_links.zip"
             conf.targetUrlZip = "https://${name}_targets.zip"
             conf.sources = arrayListOf(name+"_1", name+"_2", name+"_3")
-            conf.falseStmtDrawerOpt = mapOf(Pair("stmtDrawerType", "whitelist"), Pair("list", arrayListOf(name)))
-            conf.trueStmtDrawerOpt  = mapOf(Pair("stmtDrawerType", "blacklist"), Pair("list", arrayListOf(name)))
+            conf.falseStmtDrawerOpt = mapOf(Pair("stmtDrawerType", "allowlist"), Pair("list", arrayListOf(name)))
+            conf.trueStmtDrawerOpt  = mapOf(Pair("stmtDrawerType", "blocklist"), Pair("list", arrayListOf(name)))
             conf.namespaces = listOf("${name}_1", "${name}_2")
             return conf
         }

@@ -7,11 +7,11 @@ configurations:
       - "benchmark1_2"
       - "benchmark1_3"
     trueStmtDrawerOpt:
-      stmtDrawerType: "blacklist"
+      stmtDrawerType: "blocklist"
       list:
         - "benchmark1"
     falseStmtDrawerOpt:
-      stmtDrawerType: "whitelist"
+      stmtDrawerType: "allowlist"
       list:
         - "benchmark1"
     namespaces:
@@ -25,11 +25,11 @@ configurations:
       - "benchmark2_2"
       - "benchmark2_3"
     trueStmtDrawerOpt:
-      stmtDrawerType: "blacklist"
+      stmtDrawerType: "blocklist"
       list:
         - "benchmark2"
     falseStmtDrawerOpt:
-      stmtDrawerType: "whitelist"
+      stmtDrawerType: "allowlist"
       list:
         - "benchmark2"
     namespaces:
@@ -42,7 +42,7 @@ configurations:
     sources:
       - "benchmark3_1"
     trueStmtDrawerOpt:
-      stmtDrawerType: "WhIteLIST"
+      stmtDrawerType: "AlLoWLIST"
       list:
         - "benchmark3"
         - "3kramhcneb"

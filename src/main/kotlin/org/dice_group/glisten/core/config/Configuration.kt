@@ -7,11 +7,10 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import org.apache.jena.rdf.model.Model
 import org.dice_group.glisten.core.ConfigurationLoadException
-import org.dice_group.glisten.core.task.drawer.BlackListDrawer
+import org.dice_group.glisten.core.task.drawer.BlockListDrawer
 import org.dice_group.glisten.core.task.drawer.StmtDrawer
-import org.dice_group.glisten.core.task.drawer.WhiteListDrawer
+import org.dice_group.glisten.core.task.drawer.AllowListDrawer
 import java.io.File
-import java.io.FileNotFoundException
 import java.io.IOException
 import java.util.*
 
@@ -35,16 +34,16 @@ class Configuration{
     lateinit var namespaces: List<String>
 
     private fun createStmtDrawer(type: String, list: Collection<String>, seed: Long, model: Model, minPropOcc: Int, maxPropertyLimit: Int  ): StmtDrawer {
-        return if( type.lowercase(Locale.getDefault()) == "whitelist"){
-            WhiteListDrawer(list, seed, model, minPropOcc, maxPropertyLimit)
+        return if( type.lowercase(Locale.getDefault()) == "allowlist"){
+            AllowListDrawer(list, seed, model, minPropOcc, maxPropertyLimit)
         }else{
-            BlackListDrawer(list, seed, model, minPropOcc, maxPropertyLimit)
+            BlockListDrawer(list, seed, model, minPropOcc, maxPropertyLimit)
         }
     }
 
     /**
      * Creates a true statement drawer which can randomly generate true statements from a list.
-     * The list is either a whitelist or a blacklist, depending on what was stated in the configuration under stmtDrawerType
+     * The list is either a allowlist or a blocklist, depending on what was stated in the configuration under stmtDrawerType
      *
      * @param seed the seed to use for any random activity which will be included in the drawer
      * @param model the model to retrieve the true statements against
@@ -56,14 +55,14 @@ class Configuration{
         if(!trueStmtDrawerOpt.containsKey("list")){
             error("True Statement Drawer is missing list argument")
         }
-        return createStmtDrawer(trueStmtDrawerOpt.getOrDefault(CONSTANTS.STMTDRAWER_TYPE, "whitelist" as Any).toString(),
+        return createStmtDrawer(trueStmtDrawerOpt.getOrDefault(CONSTANTS.STMTDRAWER_TYPE, "allowlist" as Any).toString(),
                 trueStmtDrawerOpt["list"] as Collection<String>, seed, model, minPropOcc, maxPropertyLimit
             )
     }
 
     /**
      * Creates a false statement drawer which can randomly generate wrong statements from a list.
-     * The list is either a whitelist or a blacklist, depending on what was stated in the configuration under stmtDrawerType
+     * The list is either a allowlist or a blocklist, depending on what was stated in the configuration under stmtDrawerType
      *
      * @param seed the seed to use for any random activity which will be included in the drawer
      * @param model the model to retrieve the wrong/false statements against
@@ -75,7 +74,7 @@ class Configuration{
         if(!falseStmtDrawerOpt.containsKey("list")){
             error("False Statement Drawer is missing list argument")
         }
-        return createStmtDrawer(falseStmtDrawerOpt.getOrDefault(CONSTANTS.STMTDRAWER_TYPE, "whitelist" as Any).toString(),
+        return createStmtDrawer(falseStmtDrawerOpt.getOrDefault(CONSTANTS.STMTDRAWER_TYPE, "allowlist" as Any).toString(),
             falseStmtDrawerOpt["list"] as Collection<String>, seed, model, minPropOcc, maxPropertyLimit
         )
     }

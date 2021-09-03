@@ -5,12 +5,15 @@ configurations:
     sources:
       - "file:///home/minimal/Documents/glisten_files/small/FictionalCharacter.nt"
     trueStmtDrawerOpt:
-      stmtDrawerType: "whitelist"
+      stmtDrawerType: "allowlist"
       list:
         - "http://dbpedia.org/ontology/mythology"
         - "http://dbpedia.org/ontology/creator"
     falseStmtDrawerOpt:
-      stmtDrawerType: "whitelist"
+      stmtDrawerType: "allowlist"
       list:
         - "http://dbpedia.org/ontology/mythology"
         - "http://dbpedia.org/ontology/creator"
+    namespaces:
+      - "http://dbpedia.org/ontology/"
+      - "http://dbpedia.org/properties/"
