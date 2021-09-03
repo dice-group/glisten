@@ -24,16 +24,12 @@ abstract class Scorer(val namespaces: List<String>) {
      * @return the AUC score
      */
     fun getScore(endpoint: String, facts: List<Pair<Statement, Double>>) : Double{
-        //count true and false statements
-        val trueStmts = facts.count { it.second > 0 }
-        val falseStmts = facts.count { it.second <= 0 }
-
         //get the actual score
         val scores = getScores(endpoint, facts)
         //sort by veracity score s.t. highest score is on top
         scores.sortByDescending { it.second }
 
-        return getAUC(scores, trueStmts, falseStmts)
+        return getAUC(scores)
     }
 
     /**
@@ -49,9 +45,16 @@ abstract class Scorer(val namespaces: List<String>) {
 
     /**
      * AUC helper function which will create a ROC curve and calculates its AUC.
-     * the ROC will be calculated by the given scores
+     * the ROC will be calculated by the given scores in the given order
+     *
+     * @param scores the scores containing pairs of th trueness value and the fact scorer value
+     * @return the AUC score
      */
-    fun getAUC(scores: List<Pair<Double, Double>>, trueStmts: Int, falseStmts: Int) : Double{
+    fun getAUC(scores: List<Pair<Double, Double>>) : Double{
+        //count true and false statements
+        val trueStmts = scores.count{ it.first > 0.0 }
+        val falseStmts = scores.count{ it.first <= 0.0 }
+
         val roc = ROCCurve(trueStmts,falseStmts)
         scores.forEach { (value, _) ->
             if(value>0){
