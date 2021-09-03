@@ -8,6 +8,7 @@ import org.dice_group.glisten.core.config.CONSTANTS
 import org.dice_group.glisten.core.config.Configuration
 import org.dice_group.glisten.core.scorer.Copaal
 import org.dice_group.glisten.core.scorer.FactGenerator
+import org.dice_group.glisten.core.scorer.Scorer
 import org.dice_group.glisten.core.utils.DownloadUtils
 import org.dice_group.glisten.core.utils.RDFUtils
 import java.io.File
@@ -26,14 +27,17 @@ class CoreEvaluator(private val conf: Configuration, private val rdfEndpoint: St
     var minPropOcc = 10
     var maxPropertyLimit = 10
 
+    var scorer: Scorer = Copaal(conf.namespaces)
+
     /**
      * Downloads the linked datasets and extract them to the linkedPath
      *
+     * @param zipDest the destination folder to download the zip file to
      * @throws ZipException if the downloaded file is not a zip file
      */
     @Throws(ZipException::class)
     fun init(zipDest: String){
-        val zipFile = DownloadUtils.download(conf.linksUrlZip, "/")
+        val zipFile = DownloadUtils.download(conf.linksUrlZip, zipDest)
         val linksZip = ZipFile(zipFile)
         try {
             linksZip.extractAll(linkedPath)
@@ -83,6 +87,7 @@ class CoreEvaluator(private val conf: Configuration, private val rdfEndpoint: St
 
 
     //TODO clean me up
+    //FIXME the ROC curve can still get worse
     fun getROC(source: String, facts: List<Pair<Statement, Double>>, recommendations: MutableList<Pair<String, Double>>): ROCCurve{
         recommendations.sortByDescending { it.second }
         //steps doesn't ,matter in our case, we don't know the first either way
@@ -125,7 +130,6 @@ class CoreEvaluator(private val conf: Configuration, private val rdfEndpoint: St
             RDFUtils.loadTripleStoreFromScript(linkdataset, CONSTANTS.SCRIPT_FILE)
         }
         //Let the Scorer run
-        val scorer = Copaal(conf.namespaces)
         return scorer.getScore(rdfEndpoint, facts)
     }
 
