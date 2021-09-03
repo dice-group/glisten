@@ -55,8 +55,7 @@ abstract class StmtDrawer(seed: Long, open val model : Model, private val minPro
             return emptySet()
         }
         //get random statments by shuffeling and choosing [:limit]
-        stmts.shuffled(random).subList(0, maxPropertyLimit.coerceAtMost(stmts.size)).map { stmt -> ResourceFactory.createStatement(stmt.subject, stmt.predicate, stmt.`object`) }
-        return stmts
+        return stmts.shuffled(random).subList(0, maxPropertyLimit.coerceAtMost(stmts.size)).map { stmt -> ResourceFactory.createStatement(stmt.subject, stmt.predicate, stmt.`object`) }
     }
 
 
