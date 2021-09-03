@@ -70,3 +70,22 @@ abstract class Scorer(val namespaces: List<String>) {
 
     }
 }
+
+
+object ScorerFactory{
+
+    /**
+     * Create a Scorer Algorithm from a String representing the algorithm and the namespaces to use
+     *
+     * Current Implemented Algorithms:
+     *
+     * - Copaal
+     */
+    fun createScorer(scorerAlgorithm: String, namespaces: List<String>) : Scorer  {
+        var scorer : Scorer = Copaal(namespaces)
+        when(scorerAlgorithm){
+            "copaal" -> scorer = Copaal(namespaces)
+        }
+        return scorer
+    }
+}

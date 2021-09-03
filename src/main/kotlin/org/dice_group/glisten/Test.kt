@@ -11,10 +11,15 @@ import org.dice_group.glisten.core.config.Configuration
 import org.dice_group.glisten.core.config.ConfigurationFactory
 import org.dice_group.glisten.core.scorer.FactGenerator
 import org.dice_group.glisten.core.evaluation.CoreEvaluator
+import org.dice_group.glisten.core.scorer.Copaal
+import org.dice_group.glisten.core.scorer.Scorer
+import org.dice_group.glisten.core.scorer.ScorerFactory
 import org.dice_group.glisten.core.utils.DownloadUtils
 import org.dice_group.glisten.core.utils.RDFUtils
 import picocli.CommandLine
 import java.io.File
+import java.util.*
+import kotlin.Comparator
 import kotlin.jvm.Throws
 import kotlin.random.Random
 
@@ -33,7 +38,7 @@ fun main(args: Array<String>) {
     description = ["Executes the glisten workflow without Hobbit and prints the ROC curve at the end. Mostly useful for debugging."])
 class Test{
 
-    @CommandLine.Option(names = ["-s", "--seed"], paramLabel = "Seed", description = ["the seed to use for anything random we do. Default=1234L"])
+    @CommandLine.Option(names = ["-S", "--seed"], paramLabel = "Seed", description = ["the seed to use for anything random we do. Default=1234L"])
     var seed = 1234L
 
     @CommandLine.Option(names = ["--max-property-limit"], description = ["the maximum a property is allowed to be added for performance reasons. Default=30"])
@@ -61,6 +66,10 @@ class Test{
 
     @CommandLine.Option(names = ["-o", "--order-file"], description = ["A file containing the order of the recommendations, if not set, will be random"])
     var orderFile = ""
+
+    @CommandLine.Option(names = ["-s", "--scorer"], description = ["The Scorer algorithm to use. Algorithms: [Copaal] "])
+    var scorerAlgorithm = "Copaal"
+
 
 
     @CommandLine.Option(names = ["--clean-up"], description = ["if set, will "])
@@ -156,7 +165,8 @@ class Test{
     }
 
     private fun createEvaluator(conf: Configuration): CoreEvaluator{
-        val evaluator = CoreEvaluator(conf, rdfEndpoint)
+        val scorer = ScorerFactory.createScorer(System.getenv()[CONSTANTS.SCORER_ALGORITHM]!!, conf.namespaces)
+        val evaluator = CoreEvaluator(conf, rdfEndpoint, scorer)
         evaluator.seed= seed
         evaluator.maxPropertyLimit =maxPopertyLimit
         evaluator.maxRecommendations=maxRecommendations

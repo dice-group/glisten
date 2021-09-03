@@ -16,7 +16,7 @@ import java.io.IOException
 import java.net.URL
 import kotlin.jvm.Throws
 
-class CoreEvaluator(private val conf: Configuration, private val rdfEndpoint: String) {
+class CoreEvaluator(private val conf: Configuration, private val rdfEndpoint: String, private val scorer: Scorer) {
 
     var linkedPath = "./links"
     //set max Recommendations to TOP 10
@@ -28,7 +28,6 @@ class CoreEvaluator(private val conf: Configuration, private val rdfEndpoint: St
     var minPropOcc = 10
     var maxPropertyLimit = 10
 
-    var scorer: Scorer = Copaal(conf.namespaces)
 
     /**
      * Downloads the linked datasets and extract them to the linkedPath

@@ -25,16 +25,20 @@ import org.dice_group.glisten.core.config.CONSTANTS
 import org.dice_group.glisten.core.config.Configuration
 import org.dice_group.glisten.core.config.ConfigurationFactory
 import org.dice_group.glisten.core.evaluation.CoreEvaluator
+import org.dice_group.glisten.core.scorer.Copaal
+import org.dice_group.glisten.core.scorer.Scorer
+import org.dice_group.glisten.core.scorer.ScorerFactory
 import org.hobbit.core.components.AbstractEvaluationModule
 import org.hobbit.core.rabbit.RabbitMQUtils
 import org.hobbit.vocab.HOBBIT
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.*
 
 
 class Evaluator : AbstractEvaluationModule() {
 
-    private var conf: Configuration? = null
+    lateinit var conf: Configuration
 
     var linkedPath = "/links"
     //set max Recommendations to TOP 10
@@ -74,10 +78,14 @@ class Evaluator : AbstractEvaluationModule() {
         if(System.getenv().containsKey(CONSTANTS.SEED)){
             seed = System.getenv()[CONSTANTS.SEED]!!.toLong()
         }
+        var scorer : Scorer = Copaal(conf.namespaces)
+        if(System.getenv().containsKey(CONSTANTS.SCORER_ALGORITHM)){
+            scorer = ScorerFactory.createScorer(System.getenv()[CONSTANTS.SCORER_ALGORITHM]!!, conf.namespaces)
+        }
         //read config, if config doesn't exists or benchamarName is not in config will throw an exception
         conf = ConfigurationFactory.findCorrectConfiguration(CONSTANTS.CONFIG_NAME, benchmarkName)
         // create core evaluator using a standard virtuoso endpoint for now.
-        coreEvaluator = CoreEvaluator(conf!!, "http://localhost:8890/sparql")
+        coreEvaluator = CoreEvaluator(conf, "http://localhost:8890/sparql", scorer)
         FileUtils.mkdirs("/links/")
         coreEvaluator.linkedPath="/links/"
 
