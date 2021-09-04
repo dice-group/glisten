@@ -56,7 +56,7 @@ object RDFUtils {
             file = File(rdffile).absolutePath
         }
         //replace url schema file:// just in case
-        var path = file.replace("file://", "")
+        var path = file.replace("file://", "").replace("file:", "")
         // we need to arguments the path and the filename,
         path = path.substringBeforeLast("/")+"/"
         val p = ProcessBuilder().command(scriptFile, path, file.substringAfterLast("/"))

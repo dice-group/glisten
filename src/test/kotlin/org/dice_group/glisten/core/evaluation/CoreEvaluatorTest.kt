@@ -3,6 +3,7 @@ package org.dice_group.glisten.core.evaluation
 import net.lingala.zip4j.exception.ZipException
 import org.apache.commons.io.FileUtils
 import org.apache.jena.rdf.model.Statement
+import org.dice_group.glisten.core.config.CONSTANTS
 import org.dice_group.glisten.core.config.Configuration
 import org.dice_group.glisten.core.scorer.Scorer
 import org.junit.jupiter.api.Test
@@ -94,14 +95,66 @@ class CoreEvaluatorTest {
     //TODO getAUC - this is basically the whole workflow
     // MockupScript -> check if correct links will be used
     // MockupScorer -> simply return some scores (no full functionality)
-    // correct normalizing (remove baseline)
+    // we can ignore basically everything here.
+    // model can be empty, we provide the actual scores through the mockup scorer
+    // so we just need to test the returning AUC and if the script is correctly set using a mockup script
+    @ParameterizedTest
+    @MethodSource("createAUCArguments")
+    fun `given an evaluator and some recommendations the correct auc should be returned and the correct scripts should be executed`(
+        recommendations: MutableList<Pair<String, Double>>,
+        scorer: Scorer,
+        expected : Double
+    ){
+        File("ABCDEFGH_THIS_SHOULDNTEXSISTS.txt").deleteOnExit()
 
+        val evaluator = CoreEvaluator(createMockConfig(), "doesntmatter", scorer)
+        evaluator.triplestoreLoaderScript = "src/test/resources/scripts/write.sh"
+        //we need to have an actual source here
+        val source = File("src/test/resources/models/aucModel.nt").toURI().toString()
+        val auc = evaluator.getAUC(source, recommendations)
+        assertEquals(expected, auc)
+
+        //check if script was correctly executed
+        val lines = FileUtils.readLines(File("ABCDEFGH_THIS_SHOULDNTEXSISTS.txt"))
+
+        assertEquals("${source.substringBeforeLast("/").replace("file:", "")}/ ${source.substringAfterLast("/")}", lines[0])
+
+        //check if the script got the correct targets links
+        for (i in 1 until lines.size){
+
+            val file = recommendations[i-1].first
+            //and the path as linked path! but without the file: schema
+            val path = "${File(evaluator.linkedPath).toURI().toString().replace("file:","")}/"
+            //we have the link aucModel_TARGET
+            assertEquals("$path aucModel_${file.substringAfterLast("/")}", lines[i])
+        }
+        File("ABCDEFGH_THIS_SHOULDNTEXSISTS.txt").delete()
+
+    }
 
 
     companion object {
 
+        @JvmStatic
+        fun createAUCArguments() = Stream.of(
+            Arguments.of(mutableListOf(Pair("file:///path/to/target1", 1.0), Pair("file:///path/to/target2", 0.8), Pair("file:///path/to/target3", -1.0)),
+                //we have 4 as we need to include the baseline
+                MockupScorer(listOf(0.1, 0.2, 0.3, 0.3))
+                ,1.0),
+            Arguments.of(mutableListOf(Pair("file:///path/to/target1_2", 1.0), Pair("file:///path/to/target2_2", 0.8), Pair("file:///path/to/target3_2", -1.0)),
+                //the mockup scorer acts as it has the actual order of the recommendations, we do not need to change anything at the recommendation list
+                MockupScorer(listOf(0.1, 0.1, 0.1, 0.2))
+                ,0.0),
+            Arguments.of(mutableListOf(Pair("file:///path/to/target1_3", 1.0), Pair("file:///path/to/target2_3", 0.8), Pair("file:///path/to/target3_3", -1.0)),
+                //the mockup scorer acts as it has the actual order of the recommendations, we do not need to change anything at the recommendation list
+                MockupScorer(listOf(0.1, 0.3, 0.3, 0.4))
+                ,0.5)
+        )
+
         private fun createMockConfig(): Configuration{
             val ret = Configuration()
+            ret.falseStmtDrawerOpt = mapOf(Pair(CONSTANTS.STMTDRAWER_TYPE, "allowlist"), Pair("list", listOf("http://example.com/1>")))
+            ret.trueStmtDrawerOpt = mapOf(Pair(CONSTANTS.STMTDRAWER_TYPE, "allowlist"), Pair("list", listOf("http://example.com/1>")))
             return ret
         }
 

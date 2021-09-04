@@ -28,13 +28,14 @@ import kotlin.jvm.Throws
  *
  * Which will get the source file from the provided [conf] and loads the source into the provided
  * [rdfEndpoint], which resembles the SPARQL endpoint of a triplestore.
+ * The source file will be loaded into the store using the script delcared at [CoreEvaluator.triplestoreLoaderScript]
  *
  * Using the provided [Scorer] algorithm, the baseline will be calculated using the [rdfEndpoint].
  *
  * The recommendations provided to the [getAUC] method will then be sorted after the provided values (the highest score first),
  * and for each recommendation
  * the linked dataset for that recommendation (linking source and recommendation together) will be loaded into the
- * [rdfEndpoint] and the AUC score will be calculated.
+ * [rdfEndpoint] and the AUC score will be calculated using the script declared in [CoreEvaluator.triplestoreLoaderScript].
  *
  * For each AUC score the algorithm will then look if the AUC score got better as the previous score.
  * If the score got better, the recommendation provided more insight and seems topical more near to the source.
@@ -97,9 +98,9 @@ class CoreEvaluator(private val conf: Configuration, private val rdfEndpoint: St
     var seed = 1234L
     var numberOfFalseStatements = 10
     var numberOfTrueStatements = 10
-    var minPropOcc = 10
-    var maxPropertyLimit = 10
-
+    var minPropOcc = 1
+    var maxPropertyLimit = 30
+    var triplestoreLoaderScript = CONSTANTS.SCRIPT_FILE
 
     /**
      * Downloads the linked datasets and extract them to the linkedPath
@@ -130,6 +131,8 @@ class CoreEvaluator(private val conf: Configuration, private val rdfEndpoint: St
      * Calculates the AUC score for all recommendations (datasets)
      * Will use the name of source and the names in recommendations to get the downloaded linked dataset and add them to the triplestore
      *
+     * The source model will be loaded into the triple store at first.
+     *
      * The recommendations will be ordered (desc) after the double value (representing how good the recommendation fits to the source)
      * Thus the best recommendation will be added first, the score for that recommendation will be calculated added to the ROC curve and so on.
      *
@@ -151,10 +154,14 @@ class CoreEvaluator(private val conf: Configuration, private val rdfEndpoint: St
      * @return the normalized AUC score
      */
     fun getAUC(source: String, recommendations: MutableList<Pair<String, Double>>) : Double {
-        //create source model
-        val sourceModel = ModelFactory.createDefaultModel()
-        //download file from URL stream. (is in file:/// format if locally)
-        sourceModel.read(URL(source).openStream(), null, "NT")
+        print("[-] loading source into triplestore now")
+        RDFUtils.loadTripleStoreFromScript(source, triplestoreLoaderScript)
+        println("\r[+] finished loading source into triplestore.")
+
+        //create source model and
+        // download file from URL stream. (is in file:/// format if locally)
+        val sourceModel = RDFUtils.streamNoLiterals(source)
+
         //create facts for source model
         val facts = FactGenerator.createFacts(seed,
             numberOfTrueStatements,
@@ -166,10 +173,15 @@ class CoreEvaluator(private val conf: Configuration, private val rdfEndpoint: St
         sourceModel.removeAll()
         //create baseline (w/o recommendations)
         val baseline = getScore(facts, source, "")
+
         // normalize it
-        val normalizer = 1.0/(1-baseline)
+        //if we use the better ROC, we don't need to normalize anymore.
+        //val normalizer = 1.0/(1-baseline)
+        //val roc = getROC(source, facts, recommendations)
+        //return normalizer*(roc.calculateAUC()-baseline)
+
         val roc = getBetterROC(baseline, source, facts, recommendations)
-        return normalizer*(roc.calculateAUC()-baseline)
+        return roc.calculateAUC()
     }
 
     /**
@@ -268,6 +280,7 @@ class CoreEvaluator(private val conf: Configuration, private val rdfEndpoint: St
      * Gets the AUC score of running [Copaal] against the combination of the current Datasets loaded into the triple store
      * and the currentDataset.
      * Will add the linked dataset `${linkedPath}/sourceName_currentDataset` to the triple store using the [RDFUtils.loadTripleStoreFromScript] method.
+     * The script which will be used is declared in [triplestoreLoaderScript]
      *
      * If you want to use just the source model to generate a baseline, set the currentDataset parameter to an empty string
      *
@@ -279,9 +292,9 @@ class CoreEvaluator(private val conf: Configuration, private val rdfEndpoint: St
     fun getScore(facts: List<Pair<Statement, Double>>, sourceName: String, currentDataset: String) : Double{
         if(currentDataset.isNotEmpty()) {
             //(Download is in init)
-            val linkdataset = "file://$linkedPath/" + sourceName.substringAfterLast("/")
+            val linkdataset = "${File(linkedPath).toURI()}/" + sourceName.substringAfterLast("/")
                 .removeSuffix(".nt") + "_" + currentDataset.substringAfterLast("/")
-            RDFUtils.loadTripleStoreFromScript(linkdataset, CONSTANTS.SCRIPT_FILE)
+            RDFUtils.loadTripleStoreFromScript(linkdataset, triplestoreLoaderScript)
         }
         //Let the Scorer run
         return scorer.getScore(rdfEndpoint, facts)

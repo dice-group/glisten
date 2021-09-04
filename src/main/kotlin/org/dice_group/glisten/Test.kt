@@ -103,11 +103,8 @@ class Test : Callable<Int> {
 
         //Set parameters
         val evaluator = createEvaluator(conf)
-
-        print("[-] loading source into triplestore now")
+        evaluator.init("/tmp/")
         val sourceFile = conf.sources[0]
-        RDFUtils.loadTripleStoreFromScript(sourceFile, CONSTANTS.SCRIPT_FILE)
-        println("\r[+] finished loading source into triplestore.")
 
         //create source model for fact generation
         println("[+] reading source Model now")
