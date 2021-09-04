@@ -11,14 +11,12 @@ import org.dice_group.glisten.core.config.Configuration
 import org.dice_group.glisten.core.config.ConfigurationFactory
 import org.dice_group.glisten.core.scorer.FactGenerator
 import org.dice_group.glisten.core.evaluation.CoreEvaluator
-import org.dice_group.glisten.core.scorer.Copaal
-import org.dice_group.glisten.core.scorer.Scorer
 import org.dice_group.glisten.core.scorer.ScorerFactory
 import org.dice_group.glisten.core.utils.DownloadUtils
 import org.dice_group.glisten.core.utils.RDFUtils
 import picocli.CommandLine
 import java.io.File
-import java.util.*
+import java.util.concurrent.Callable
 import kotlin.Comparator
 import kotlin.jvm.Throws
 import kotlin.random.Random
@@ -30,15 +28,14 @@ import kotlin.random.Random
 fun main(args: Array<String>) {
     val executor = Test()
     //*args converts array to vararg in kotlin
-    CommandLine(executor).parseArgs(*args)
-    executor.execute()
+    CommandLine(executor).execute(*args)
 }
 
 @CommandLine.Command(name = "glisten-test", mixinStandardHelpOptions = true, version = ["glisten 1.0"],
     description = ["Executes the glisten workflow without Hobbit and prints the ROC curve at the end. Mostly useful for debugging."])
-class Test{
+class Test : Callable<Int> {
 
-    @CommandLine.Option(names = ["-S", "--seed"], paramLabel = "Seed", description = ["the seed to use for anything random we do. Default=1234L"])
+    @CommandLine.Option(names = ["-S", "--seed"], description = ["the seed to use for anything random we do. Default=1234L"])
     var seed = 1234L
 
     @CommandLine.Option(names = ["--max-property-limit"], description = ["the maximum a property is allowed to be added for performance reasons. Default=30"])
@@ -58,7 +55,7 @@ class Test{
     @CommandLine.Option(names = ["-nofs", "--no-of-false-stmts"], description = ["the no. of false statements to generate. Default=5"])
     var numberOfFalseStatements = 5;
 
-    @CommandLine.Option(names=["-e", "--endpoint"], description = ["the rdf endpoint to use"])
+    @CommandLine.Parameters(description = ["the rdf endpoint to use"])
     lateinit var rdfEndpoint : String
 
     @CommandLine.Option(names = ["-c", "--config"], description = ["the config file for glisten. Default: data_config.yml"])
@@ -72,7 +69,7 @@ class Test{
 
 
 
-    @CommandLine.Option(names = ["--clean-up"], description = ["if set, will "])
+    @CommandLine.Option(names = ["--clean-up"], description = ["if set, will remove the testing directory which includes all downloaded and extracted datasets."])
     var cleanUp = false
 
 
@@ -82,7 +79,7 @@ class Test{
      * @throws ConfigurationLoadException If the Configuration is not found or the test_benchmark name doesn't exists
      */
     @Throws(ConfigurationLoadException::class)
-    fun execute(){
+    override fun call(): Int{
         //not sure why we need these, but on some servers there are some problems other wise.
         ARQ.init()
         RIOT.init()
@@ -126,6 +123,7 @@ class Test{
             FileUtils.delete("testing/")
             println("\r[+] Deleted testing directory.")
         }
+        return 0
     }
 
     /**
@@ -165,7 +163,7 @@ class Test{
     }
 
     private fun createEvaluator(conf: Configuration): CoreEvaluator{
-        val scorer = ScorerFactory.createScorer(System.getenv()[CONSTANTS.SCORER_ALGORITHM]!!, conf.namespaces)
+        val scorer = ScorerFactory.createScorerOrDefault(System.getenv()[CONSTANTS.SCORER_ALGORITHM]!!, conf.namespaces)
         val evaluator = CoreEvaluator(conf, rdfEndpoint, scorer)
         evaluator.seed= seed
         evaluator.maxPropertyLimit =maxPopertyLimit
@@ -202,7 +200,7 @@ class Test{
         val baseline = evaluator.getScore(facts, source, "")
         println("\n[+] Baseline: %f".format(baseline))
         evaluator.linkedPath = File("testing/links/").absolutePath
-        val roc = evaluator.getROC(source, facts, recommendations)
+        val roc = evaluator.getBetterROC(baseline, source, facts, recommendations)
         //y needs to get bigger.
         print(roc)
 

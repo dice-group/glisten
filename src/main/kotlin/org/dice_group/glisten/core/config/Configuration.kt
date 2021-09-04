@@ -1,5 +1,6 @@
 package org.dice_group.glisten.core.config
 
+import org.dice_group.glisten.core.scorer.Scorer
 import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
@@ -14,15 +15,64 @@ import java.io.File
 import java.io.IOException
 import java.util.*
 
-
 /**
+ * ## Description
  *
-- name: "benchmarkName"
-source :
-- ...
-target : URL.zip
-TrueStmtDrawer
-FalseStmtDrawer
+ * The Configuration class containing the
+ *
+ * * benchmark Name
+ * * the list of sources
+ * * the url link to the zip file containing all targets
+ * * the url link to the zip file containing all linked datasets
+ * * the namespaces to use in the [Scorer] algorithm
+ * * The true anf false statement drawer options
+ *
+ * The Configuration shall be created using the [ConfigurationFactory.findCorrectConfiguration] method
+ * providing a direct benchmarkName.
+ *
+ * Further on the Configuration creates the actual true statement drawer and respectively the false statement drawer by
+ * calling the [createTrueStmtDrawer] and resp. [createFalseStmtDrawer] methods.
+ *
+ * The map for the [trueStmtDrawerOpt] and resp [falseStmtDrawerOpt] should include the following two key, value pairs
+ *
+ * * [CONSTANTS.STMTDRAWER_TYPE] - which defines if to use an [AllowListDrawer] (put in the string `allowlist`) or a [BlockListDrawer] (use any other string)
+ * * "list" - containing a [Collection] object which contains the string representation of allowed or blocked properties.
+ *
+ * ```
+ * ```
+ * ## Example
+ *
+ * ```kotlin
+ * val config = Configuration()
+ * config.name = "MyBenchmark"
+ * config.sources = listOf("file:///path/to/source1.nt","file:///path/to/source2.nt")
+ *
+ * //these can be locally using file:/// or remote using http[s]://
+ * config.targetUrlZip = "file:///path/to/targets.zip"
+ * config.linksUrlZip = "file:///path/to/linked_datasets.zip"
+ *
+ * config.trueStmtDrawerOpt = mapOf(
+ *              Pair(CONSTANTS.STMTDRAWER_TYPE, "AllowList"),
+ *              Pair("list", listOf(
+ *                  "http://example.com/property/Allowed1",
+ *                  "http://example.com/property/Allowed2"
+ *              )))
+ * config.falseStmtDrawerOpt = mapOf(
+ *              Pair(CONSTANTS.STMTDRAWER_TYPE, "BlockList"),
+ *              Pair("list", listOf(
+ *                  "http://example.com/property/Blocked1",
+ *                  "http://example.com/property/Blocked2"
+ *              )))
+ *
+ * // load your source model , we will use the first source model of the config here, normally you want to loop that
+ *
+ * val model = RDFDataMgr.loadModel(config.sources[0], Lang.NT)
+ *
+ * val trueStmtDrawer = config.createTrueStmtDrawer(seed = 123, model = model, minPropOcc = 1, maxPropertyLimit = 10)
+ * val falseStmtDrawer = config.createTrueStmtDrawer(seed = 123, model = model, minPropOcc = 1, maxPropertyLimit = 10)
+ * ```
+ *
+ * @see ConfigurationFactory
  */
 class Configuration{
     lateinit var name: String
@@ -97,6 +147,17 @@ class Configuration{
             return check
         }
         return false
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + sources.hashCode()
+        result = 31 * result + targetUrlZip.hashCode()
+        result = 31 * result + linksUrlZip.hashCode()
+        result = 31 * result + trueStmtDrawerOpt.hashCode()
+        result = 31 * result + falseStmtDrawerOpt.hashCode()
+        result = 31 * result + namespaces.hashCode()
+        return result
     }
 
 }

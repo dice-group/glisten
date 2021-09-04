@@ -33,7 +33,6 @@ import org.hobbit.core.rabbit.RabbitMQUtils
 import org.hobbit.vocab.HOBBIT
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.*
 
 
 class Evaluator : AbstractEvaluationModule() {
@@ -80,9 +79,9 @@ class Evaluator : AbstractEvaluationModule() {
         }
         var scorer : Scorer = Copaal(conf.namespaces)
         if(System.getenv().containsKey(CONSTANTS.SCORER_ALGORITHM)){
-            scorer = ScorerFactory.createScorer(System.getenv()[CONSTANTS.SCORER_ALGORITHM]!!, conf.namespaces)
+            scorer = ScorerFactory.createScorerOrDefault(System.getenv()[CONSTANTS.SCORER_ALGORITHM]!!, conf.namespaces)
         }
-        //read config, if config doesn't exists or benchamarName is not in config will throw an exception
+        //read config, if config doesn't exists or benchamarkName is not in config will throw an exception
         conf = ConfigurationFactory.findCorrectConfiguration(CONSTANTS.CONFIG_NAME, benchmarkName)
         // create core evaluator using a standard virtuoso endpoint for now.
         coreEvaluator = CoreEvaluator(conf, "http://localhost:8890/sparql", scorer)
