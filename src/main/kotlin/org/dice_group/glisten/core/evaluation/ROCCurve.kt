@@ -10,7 +10,7 @@ enum class DIRECTION{
 /**
  * Creates the underlying ROC Curve.
  *
- * Shamelessy stolen from gerbil KBC
+ * Shamelessly stolen from gerbil KBC
  */
 class ROCCurve(private val trueStmts: Int, private val falseStmts: Int) {
 
@@ -127,6 +127,11 @@ class ROCCurve(private val trueStmts: Int, private val falseStmts: Int) {
         }
     }
 
+    /**
+     * Finalizes (adding a point to (1.0, 1.0)) and then calculating the area under the curve \[AUC\] from the ROCCurve
+     *
+     * @return the AUC score for this ROC curve
+     */
     fun calculateAUC(): Double {
         finalize()
         var auc = 0.0

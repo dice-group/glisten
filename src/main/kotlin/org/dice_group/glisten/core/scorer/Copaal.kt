@@ -5,8 +5,6 @@ import org.aksw.jena_sparql_api.delay.core.QueryExecutionFactoryDelay
 import org.aksw.jena_sparql_api.http.QueryExecutionFactoryHttp
 import org.aksw.jena_sparql_api.timeout.QueryExecutionFactoryTimeout
 import org.apache.jena.rdf.model.Statement
-import org.apache.jena.vocabulary.RDF
-import org.dice_group.glisten.core.evaluation.ROCCurve
 import org.dice_research.fc.IFactChecker
 import org.dice_research.fc.paths.PathBasedFactChecker
 import org.dice_research.fc.paths.PredicateFactory
@@ -20,9 +18,25 @@ import org.dice_research.fc.sum.FixedSummarist
 import java.util.concurrent.TimeUnit
 
 
-
+/**
+ * ## Description
+ *
+ * The Scorer algorithm uses the Copaal Path Based Fact Checker to calculate the score of each fact.
+ *
+ * For more details on how Copaal works, have a look at [https://github.com/dice-group/COPAAL/](https://github.com/dice-group/COPAAL/)
+ *
+ * @param namespaces The namespaces to consider while fact checking.
+ */
 class Copaal(namespaces: List<String>) : Scorer(namespaces){
 
+    /**
+     * Creates a COPAAL [PathBasedFactChecker] using an [QueryExecutionFactoryHttp] with a delay of 200ms and a timeout of 30s
+     *
+     * It uses an [NPMIBasedScorer] using caching and the [PropPathBasedPairCountRetriever] and a [FixedSummarist].
+     *
+     * @param endpoint the SPARQL endpoint to use
+     * @param namespaces the allowed namespaces, if empty will allow all namespaces
+     */
     private fun createFactChecker(endpoint: String, namespaces: List<String>): IFactChecker{
         var qef : QueryExecutionFactory = QueryExecutionFactoryHttp(endpoint)
         qef = QueryExecutionFactoryDelay(qef, 200L)
@@ -70,8 +84,42 @@ class Copaal(namespaces: List<String>) : Scorer(namespaces){
 
 }
 
+/**
+ * The namespace Filter creates a FILTER clause allowing all namespaces.
+ *
+ * @param namespaces the namespaces which should be allowed
+ */
 class NamespaceFilter(private val namespaces: List<String>) : IRIFilter{
 
+    /**
+     * ## Description
+     *
+     * Adds a SPARQL FILTER clause to the [queryBuilder] checking that
+     * the solution for the [variableName] starts with the one of the [namespaces]
+     *
+     * Note that if namespaces is an empty list it will add no FILTER add all allowing all namespaces.
+     *
+     * ```
+     * ```
+     * ## Example
+     *
+     * ```kotlin
+     * val filter = NamespaceFilter(listOf("http://example.com", "http://test.org"))
+     *
+     * val queryBuilder = StringBuilder("SELECT * {?var ?p ?o.")
+     *
+     * filter.addFilter("var", queryBuilder)
+     *
+     * queryBuilder.append("}")
+     *
+     * assertEquals(
+     *      "SELECT * {?var ?p ?o. FILTER(strstarts(str(?var),"http://example.com") || strstarts(str(?var),"http://test.org")) \n}",
+     *      queryBuilder.toString()
+     * )
+     *
+     * ```
+     *
+     */
     override fun addFilter(variableName: String, queryBuilder: StringBuilder) {
         if(namespaces.isNotEmpty()) {
             queryBuilder.append(" FILTER(")
