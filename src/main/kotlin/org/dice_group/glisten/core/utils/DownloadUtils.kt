@@ -9,9 +9,14 @@ import java.io.IOException
 import java.net.URL
 import kotlin.jvm.Throws
 
+/**
+ * Utils class for everything related to Downloads and Zip files.
+ */
 object DownloadUtils {
 
     /**
+     * ## Description
+     *
      * Downloads a file located at the url (for local use, use: file:// as the schema)
      * and saves it in the destination folder
      *
@@ -29,6 +34,8 @@ object DownloadUtils {
     }
 
     /**
+     * ## Description
+     *
      * Unzips a given file to a destination folder
      *
      * @param file the file to unzip

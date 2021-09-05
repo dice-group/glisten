@@ -10,12 +10,24 @@ import java.io.File
 import java.io.FileNotFoundException
 import kotlin.jvm.Throws
 
+/**
+ * Util class to stream RDF files in memory or into triplestores using scripts.
+ */
 object RDFUtils {
 
     /**
+     * ## Description
+     *
      * Streams a file to an RDF Model ignoring all Literals.
+     *
+     * ## Example
+     *
+     * ```kotlin
+     * val myModel = RDFUtils.streamNoLiterals("my-rdf-file.nt")
+     * ```
+     *
      * @param file the rdf file to read
-     * @return the Model containing all triples from the rdf file except Literals
+     * @return the [Model] containing all triples from the rdf file except Literals
      */
     fun streamNoLiterals(file: String) : Model{
         val streamer = StreamRDFNoLiteral()
@@ -24,22 +36,44 @@ object RDFUtils {
         return streamer.model
     }
 
+
     /**
-     * Removes all literals from a model
+     * ## Description
+     *
+     * Removes all literal objects from the given [Model]
+     *
+     * ## Example
+     *
+     * ```kotlin
+     * val model = ... //load the Model here
+     *
+     * RDFUtils.removeLiterals(model)
+     * //the model will have no literals at this point on forward
+     * ```
+     *
      * @param model the model to remove all triples from
      */
-    fun removeNonURIObjects(model: Model?){
+    fun removeLiterals(model: Model?){
         val remove = model?.listStatements()?.toList()?.filter { it.`object`.isLiteral }
         model?.remove(remove)
     }
 
 
     /**
+     * ## Description
+     *
      * Loads a file into the triplestore using the load_triplestore.sh script.
      * The script needs to be in the same folder as this was executed.
      *
-     * The rdffile should be set to URL syntax (meaning file://path/to/file.nt)
+     * The [rdffile] should be set to URL syntax (meaning file://path/to/file.nt)
      * However file.nt would also work as long as the file is in the local directory
+     *
+     * ## Example
+     *
+     * ```kotlin
+     * //will execute the following bash command `./my-triplestore-loader-script.sh /path/to my-rdf-file.nt`
+     * RDFUtils.loadTripleStoreFromScript("/path/to/my-rdf-file.nt", "my-triplestore-loader-script.sh")
+     * ```
      *
      * @param rdffile the rdf file to load into the triplestore (use URL syntax, aka file://..)
      * @param scriptFile the script file to use to load the triplesotre

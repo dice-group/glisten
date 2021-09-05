@@ -177,11 +177,46 @@ class Configurations{
 object ConfigurationFactory{
 
     /**
-     * Reads the Configurations from the given file, and retrieves the Configuration where the name attribute is equals to the benchmarkName parameter
+     * ## Description
+     *
+     * Reads the [Configurations] from the given file, and retrieves the [Configuration] where the name attribute is equals to the benchmarkName parameter
      *
      * If either the file doesn't exists or cannot be loaded or the configurations file doesn't hold a configuration with the given name throws a
-     * ConfigurationLoadException
+     * [ConfigurationLoadException]
      *
+     * ## Example
+     *
+     * Assuming our file is called "config.yaml" and looks similar to this
+     *
+     * ```yaml
+     * configurations:
+     *  - name: "myBenchmark"
+     *    linksUrlZip: "file:///path/to/links.zip"
+     *    targetUrlZip: "file:///path/to/targets.zip"
+     *    sources:
+     *    - "file:///path/to/sources/source1.nt"
+     *    trueStmtDrawerOpt:
+     *      stmtDrawerType: "allowlist"
+     *      list:
+     *        - "http://dbpedia.org/ontology/mythology"
+     *    falseStmtDrawerOpt:
+     *      stmtDrawerType: "allowlist"
+     *      list:
+     *        - "http://dbpedia.org/ontology/mythology"
+     *    namespaces:
+     *      - "http://dbpedia.org/ontology/"
+     * ```
+     *
+     * Then the following code will yield the configuration with the name attribute myBenchmark
+     *
+     * ```kotlin
+     * // the config file will get the configuration with the name 'myBenchmark'
+     * val config = ConfigurationFactory.findCorrectConfiguration("config.yaml", "myBenchmark")
+     *
+     * assertEquals("myBenchmark", config.name)
+     * assertEquals("file:///path/to/links.zip", config.links.zip)
+     * //and so on.
+     * ```
      *
      * @param configurationsFile The File name containing all configurations
      * @param benchmarkName The name of the benchmark to get the configuration for

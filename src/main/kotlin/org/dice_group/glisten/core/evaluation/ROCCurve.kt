@@ -1,5 +1,8 @@
 package org.dice_group.glisten.core.evaluation
 
+/**
+ * Enum providing the possible Directions for a [ROCCurve]
+ */
 enum class DIRECTION{
     UP, RIGHT
 }

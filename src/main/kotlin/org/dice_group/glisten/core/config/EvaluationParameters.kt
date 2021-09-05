@@ -3,7 +3,24 @@ package org.dice_group.glisten.core.config
 import org.dice_group.glisten.core.evaluation.CoreEvaluator
 
 /**
+ * ## Description
+ *
  * The EvaluationParameters provides all the parameters used inside the [CoreEvaluator]
+ *
+ * ## Example
+ *
+ * ```kotlin
+ * val params = EvaluationParameters(
+ *                  seed = 1234L,
+ *                  numberOfTrueStatements = 10,
+ *                  numberOfFalseStatements = 10,
+ *                  minPropertyOccurrences = 1,
+ *                  maxPropertyLimit = 30,
+ *                  maxRecommendations = 10,
+ *                  linkedPath = "./links/",
+ *                  triplestoreLoaderScript = CONSTANTS.SCRIPT_FILE)
+ * ```
+ *
  *
  * @param seed the seed to use for any random activity
  * @param numberOfTrueStatements the number of true statements to create
@@ -13,6 +30,8 @@ import org.dice_group.glisten.core.evaluation.CoreEvaluator
  * @param maxRecommendations the maximum recommendations to test against (top-N) use 0 or smaller for all recommendations
  * @param linkedPath the path to save/look up the linked datasets into
  * @param triplestoreLoaderScript the script to load datasets into the triplestore
+ *
+ * @see EvaluationParameters.createDefault
  */
 data class EvaluationParameters(var seed: Long,
                                 var numberOfTrueStatements: Int,

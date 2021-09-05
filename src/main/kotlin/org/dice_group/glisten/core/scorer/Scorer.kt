@@ -22,7 +22,7 @@ abstract class Scorer(val namespaces: List<String>) {
     /**
      * Calculates the AUC from calculating the scores for each fact.
      *
-     * The ROC Curve which is used to calculate the score will be build by going one step up if the fact was true,
+     * The [ROCCurve] which is used to calculate the score will be build by going one step up if the fact was true,
      * or right if it was a false fact.
      *
      * The scores will be sorted descending
@@ -36,7 +36,7 @@ abstract class Scorer(val namespaces: List<String>) {
     open fun getScore(endpoint: String, facts: List<Pair<Statement, Double>>) : Double{
         //get the actual score
         val scores = getScores(endpoint, facts)
-        //sort by veracity score s.t. highest score is on top
+        //sort by veracity score s.t. the highest score is on top
         scores.sortByDescending { it.second }
 
         return getAUC(scores)
@@ -54,7 +54,7 @@ abstract class Scorer(val namespaces: List<String>) {
     abstract fun getScores(endpoint: String, facts: List<Pair<Statement, Double>>): MutableList<Pair<Double, Double>>
 
     /**
-     * AUC helper function which will create a ROC curve and calculates its AUC.
+     * AUC helper function which will create a [ROCCurve] and calculates its AUC.
      * the ROC will be calculated by the given scores in the given order
      *
      * @param scores the scores containing pairs of th trueness value and the fact scorer value
@@ -109,12 +109,12 @@ abstract class Scorer(val namespaces: List<String>) {
 object ScorerFactory{
 
     /**
-     * Create a Scorer Algorithm from a String representing the algorithm and the namespaces to use
+     * Create a [Scorer] Algorithm from a String representing the algorithm and the namespaces to use
      * An empty namespaces list will lead to all namespaces being accepted.
      *
      * Current Implemented Algorithms:
      *
-     * - Copaal
+     * - [Copaal]
      *
      * @param scorerAlgorithm The name of the scorer algorithm e.g COPAAL
      * @param namespaces The list of namespaces which should be used

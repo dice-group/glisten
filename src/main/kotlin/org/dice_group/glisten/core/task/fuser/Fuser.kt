@@ -157,7 +157,7 @@ object Fuser {
 
     private fun cleanModel(model: Model?) {
         //remove non uri resources
-        RDFUtils.removeNonURIObjects(model)
+        RDFUtils.removeLiterals(model)
         // can;t be bothered more
         val remove = model?.listStatements()?.toList()?.filter {
             URL(it.subject.uri.toString()).host == URL(it.`object`.asResource().uri.toString()).host

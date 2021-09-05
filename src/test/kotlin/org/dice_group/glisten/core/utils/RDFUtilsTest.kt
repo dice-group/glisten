@@ -20,7 +20,7 @@ class RDFUtilsTest {
         val model = ModelFactory.createDefaultModel()
         model.read(FileInputStream("src/test/resources/models/literals.nt"), null, "NT")
         assertEquals(10, model.size())
-        RDFUtils.removeNonURIObjects(model)
+        RDFUtils.removeLiterals(model)
         checkModel(model)
     }
 

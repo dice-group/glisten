@@ -16,8 +16,10 @@
  */
 package org.dice_group.glisten.core.config
 
+/**
+ * Constants which are mainly used inside the Hobbit workflow.
+ */
 object CONSTANTS {
-
 
     //Some default values for the configuration and hobbit
     const val SCRIPT_FILE = "./load_triplestore.sh"
