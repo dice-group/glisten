@@ -1,6 +1,7 @@
 package org.dice_group.glisten
 
 import com.jamonapi.utils.FileUtils
+import net.lingala.zip4j.exception.ZipException
 import org.apache.jena.query.ARQ
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.Statement
@@ -18,6 +19,7 @@ import org.dice_group.glisten.core.utils.DownloadUtils
 import org.dice_group.glisten.core.utils.RDFUtils
 import picocli.CommandLine
 import java.io.File
+import java.io.IOException
 import java.util.concurrent.Callable
 import kotlin.Comparator
 import kotlin.jvm.Throws
@@ -41,7 +43,7 @@ class Test : Callable<Int> {
     var seed = 1234L
 
     @CommandLine.Option(names = ["--max-property-limit"], description = ["the maximum a property is allowed to be added for performance reasons. Default=30"])
-    var maxPopertyLimit = 30;
+    var maxPropertyLimit = 30;
 
     @CommandLine.Option(names = ["--min-prop-occ"], description = ["the minimum a property has to occur to be considered for the fact generation. Default=10"])
     var minPropOcc = 10;
@@ -161,13 +163,13 @@ class Test : Callable<Int> {
     }
 
     private fun createEvaluator(conf: Configuration): CoreEvaluator {
-        val scorer = ScorerFactory.createScorerOrDefault(System.getenv()[CONSTANTS.SCORER_ALGORITHM]!!, conf.namespaces)
+        val scorer = ScorerFactory.createScorerOrDefault(scorerAlgorithm, conf.namespaces)
         val params = EvaluationParameters(
             seed,
             numberOfTrueStatements,
             numberOfFalseStatements,
             minPropOcc,
-            maxPopertyLimit,
+            maxPropertyLimit,
             maxRecommendations,
             File("testing/links/").absolutePath,
             CONSTANTS.SCRIPT_FILE
@@ -178,7 +180,12 @@ class Test : Callable<Int> {
 
     /**
      * A very simple and idiotic cache, but this is enough for testing purposes
+     *
+     * @throws IOException if the download link specified in the [Configuration] cannot be downloaded
+     * @throws ZipException if the downloaded zip files ar not in Zip Format
+     * @throws SecurityException if the permissions to store the downloads inside the testing/[links, target] folders aren't sufficien
      */
+    @Throws(ZipException::class, IOException::class, SecurityException::class)
     private fun simpleNaiveCache(conf: Configuration){
         if(!FileUtils.exists("testing")) {
             print("[-] testing folder doesn't exists. creating it")

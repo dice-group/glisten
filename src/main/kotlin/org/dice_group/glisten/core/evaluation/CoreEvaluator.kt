@@ -16,8 +16,9 @@ import java.io.IOException
 /**
  * ## Description
  *
- * The [CoreEvaluator] creates a the core glisten evaluator.
- * It is responsible for executing the benchmark given by  a [Configuration].
+ * The [CoreEvaluator] creates he core glisten evaluator.
+ * It is responsible for executing the benchmark given by  a [Configuration] using
+ * the provided [EvaluationParameters].
  *
  * The first step is to call the [init] function downloading the specified files inside the [conf]
  *
@@ -129,11 +130,14 @@ class CoreEvaluator(private val conf: Configuration, val params: EvaluationParam
      * ### Example:
      *
      * ```kotlin
+     * //create your evaluator here
+     * //val evaluator = CoreEvaluator(...)
+     *
      * val recommendations = mutableListOf(
      *                          Pair("file:///path/to/target1.nt", 0.1),
      *                          Pair("file:///path/to/target2.nt", 0.2),
      *                          Pair("file:///path/to/target3.nt", -0.5))
-     * val aucScore : Double = getAUC("file:///path/to/source.nt", recommendations)
+     * val aucScore : Double = evaluator.getAUC("file:///path/to/source.nt", recommendations)
      * ```
      *
      *
@@ -265,17 +269,17 @@ class CoreEvaluator(private val conf: Configuration, val params: EvaluationParam
     }
 
     /**
-     * Gets the AUC score of running [Copaal] against the combination of the current Datasets loaded into the triple store
+     * Gets the AUC score of running the [Scorer] algorithm against the combination of the current Datasets loaded into the triple store
      * and the currentDataset.
      * Will add the linked dataset `${linkedPath}/sourceName_currentDataset` to the triple store using the [RDFUtils.loadTripleStoreFromScript] method.
      * The script which will be used is declared in the provided [EvaluationParameters.triplestoreLoaderScript]
      *
      * If you want to use just the source model to generate a baseline, set the currentDataset parameter to an empty string
      *
-     * @param facts The facts to run Copaal against.
+     * @param facts The facts to run the Scorer against.
      * @param sourceName the old source name will be used to figure out the correct linked dataset.
      * @param currentDataset the target dataset name, which link to the source will be added to the store. To use no dataset, use an empty string.
-     * @return the AUC score of Copaal
+     * @return the AUC score of the Scorer algorithm
      */
     fun getScore(facts: List<Pair<Statement, Double>>, sourceName: String, currentDataset: String) : Double{
         if(currentDataset.isNotEmpty()) {

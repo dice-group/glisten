@@ -19,8 +19,9 @@ object DownloadUtils {
      * @param destFolder the folder to save the file into.
      * @return the path to file
      * @throws IOException if the destination folder doesn't exist or insufficient rights to write in the folder or the Url doesn't exists
+     * @throws SecurityException if the permissions to store the file into the destination folder aren't sufficient
      */
-    @Throws(IOException::class)
+    @Throws(IOException::class, SecurityException::class)
     fun download(url: String, destFolder: String): String{
         val destFile = destFolder+File.separator+url.substringAfterLast("/")
         FileUtils.copyURLToFile(URL(url), File(destFile))

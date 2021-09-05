@@ -84,10 +84,12 @@ class Configuration{
     lateinit var namespaces: List<String>
 
     private fun createStmtDrawer(type: String, list: Collection<String>, seed: Long, model: Model, minPropOcc: Int, maxPropertyLimit: Int  ): StmtDrawer {
-        return if( type.lowercase(Locale.getDefault()) == "allowlist"){
-            AllowListDrawer(list, seed, model, minPropOcc, maxPropertyLimit)
-        }else{
-            BlockListDrawer(list, seed, model, minPropOcc, maxPropertyLimit)
+        //Add your new statement drawer type here to the `when` clause
+        return when{
+            type.lowercase(Locale.getDefault()) == "allowlist" ->
+                AllowListDrawer(list, seed, model, minPropOcc, maxPropertyLimit)
+            else ->
+                BlockListDrawer(list, seed, model, minPropOcc, maxPropertyLimit)
         }
     }
 
@@ -162,7 +164,10 @@ class Configuration{
 
 }
 
-class Configurations(){
+/**
+ * Wrapper class which contains several [Configuration]s
+ */
+class Configurations{
     var configurations: List<Configuration> = emptyList()
 }
 
@@ -181,6 +186,8 @@ object ConfigurationFactory{
      * @param configurationsFile The File name containing all configurations
      * @param benchmarkName The name of the benchmark to get the configuration for
      * @return the configuration mapped to the benchmarkName
+     *
+     * @throws ConfigurationLoadException if the configuration cannot be found, loaded or doesn't map correctly to the [Configuration] object
      */
     @kotlin.jvm.Throws(ConfigurationLoadException::class)
     fun findCorrectConfiguration(configurationsFile: String, benchmarkName: String): Configuration{
