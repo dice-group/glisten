@@ -1,9 +1,9 @@
 configurations:
   - name: "test_benchmark"
-    linksUrlZip: "file:///home/minimal/Documents/glisten_files/small/dbpedia_links_small.zip"
-    targetUrlZip: "file:///home/minimal/Documents/glisten_files/small/dbpedia_subsets_small.zip"
+    linksUrlZip: "file:///path/to/links.zip"
+    targetUrlZip: "file:///path/to/targets.zip"
     sources:
-      - "file:///home/minimal/Documents/glisten_files/small/FictionalCharacter.nt"
+      - "file:///path/to/source1.nt"
     trueStmtDrawerOpt:
       stmtDrawerType: "allowlist"
       list:
