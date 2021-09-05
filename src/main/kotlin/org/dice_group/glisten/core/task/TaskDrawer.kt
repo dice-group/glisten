@@ -11,7 +11,7 @@ import kotlin.collections.HashSet
 
 /**
  * Code is shamelessly stolen from sven and just converted to Kotlin and adjusted for glisten.
- * Hence I didn't write any doc for it.
+ * Hence, I didn't write any doc for it.
  */
 class TaskDrawer(seed: Long, private val numberOfTrueStatements: Int, private val numberOfFalseStatements: Int, private val trueStmtDrawer: StmtDrawer, private val falseStmtDrawer: StmtDrawer ) {
 
