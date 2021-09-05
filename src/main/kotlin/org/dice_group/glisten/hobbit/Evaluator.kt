@@ -24,6 +24,7 @@ import org.apache.jena.vocabulary.RDF
 import org.dice_group.glisten.core.config.CONSTANTS
 import org.dice_group.glisten.core.config.Configuration
 import org.dice_group.glisten.core.config.ConfigurationFactory
+import org.dice_group.glisten.core.config.EvaluationParameters
 import org.dice_group.glisten.core.evaluation.CoreEvaluator
 import org.dice_group.glisten.core.scorer.Copaal
 import org.dice_group.glisten.core.scorer.Scorer
@@ -39,17 +40,12 @@ class Evaluator : AbstractEvaluationModule() {
 
     lateinit var conf: Configuration
 
-    var linkedPath = "/links"
-    //set max Recommendations to TOP 10
-    var maxRecommendations=10
     private val aucList = mutableListOf<Double>()
     private val times = mutableListOf<Double>()
-    var seed = 1234L
-    var numberOfFalseStatements = 10
-    var numberOfTrueStatements = 10
-    var minPropOcc = 10
+
     var maxPropertyLimit = 10
 
+    val params = EvaluationParameters.createDefault()
     lateinit var coreEvaluator: CoreEvaluator
 
     override fun init() {
@@ -60,33 +56,34 @@ class Evaluator : AbstractEvaluationModule() {
             benchmarkName = System.getenv()[CONSTANTS.BENCHMARK_NAME]!!
         }
         if(System.getenv().containsKey(CONSTANTS.NUMBER_OF_TRUE_STATEMENTS)){
-            numberOfTrueStatements = System.getenv()[CONSTANTS.NUMBER_OF_TRUE_STATEMENTS]!!.toInt()
+            params.numberOfTrueStatements = System.getenv()[CONSTANTS.NUMBER_OF_TRUE_STATEMENTS]!!.toInt()
         }
         if(System.getenv().containsKey(CONSTANTS.NUMBER_OF_FALSE_STATEMENTS)){
-            numberOfFalseStatements = System.getenv()[CONSTANTS.NUMBER_OF_FALSE_STATEMENTS]!!.toInt()
+            params.numberOfFalseStatements = System.getenv()[CONSTANTS.NUMBER_OF_FALSE_STATEMENTS]!!.toInt()
         }
         if(System.getenv().containsKey(CONSTANTS.MIN_PROP_OCC)){
-            minPropOcc = System.getenv()[CONSTANTS.MIN_PROP_OCC]!!.toInt()
+            params.minPropertyOccurrences = System.getenv()[CONSTANTS.MIN_PROP_OCC]!!.toInt()
         }
         if(System.getenv().containsKey(CONSTANTS.MAX_PROPERTY_LIMIT)){
-            maxPropertyLimit = System.getenv()[CONSTANTS.MAX_PROPERTY_LIMIT]!!.toInt()
+            params.maxPropertyLimit = System.getenv()[CONSTANTS.MAX_PROPERTY_LIMIT]!!.toInt()
         }
         if(System.getenv().containsKey(CONSTANTS.MAX_RECOMMENDATIONS)){
-            maxRecommendations = System.getenv()[CONSTANTS.MAX_RECOMMENDATIONS]!!.toInt()
+            params.maxRecommendations = System.getenv()[CONSTANTS.MAX_RECOMMENDATIONS]!!.toInt()
         }
         if(System.getenv().containsKey(CONSTANTS.SEED)){
-            seed = System.getenv()[CONSTANTS.SEED]!!.toLong()
+            params.seed = System.getenv()[CONSTANTS.SEED]!!.toLong()
         }
         var scorer : Scorer = Copaal(conf.namespaces)
         if(System.getenv().containsKey(CONSTANTS.SCORER_ALGORITHM)){
             scorer = ScorerFactory.createScorerOrDefault(System.getenv()[CONSTANTS.SCORER_ALGORITHM]!!, conf.namespaces)
         }
-        //read config, if config doesn't exists or benchamarkName is not in config will throw an exception
+        params.linkedPath="/links/"
+        FileUtils.mkdirs("/links/")
+
+        //read config, if config doesn't exist or benchamarkName is not in config will throw an exception
         conf = ConfigurationFactory.findCorrectConfiguration(CONSTANTS.CONFIG_NAME, benchmarkName)
         // create core evaluator using a standard virtuoso endpoint for now.
-        coreEvaluator = CoreEvaluator(conf, "http://localhost:8890/sparql", scorer)
-        FileUtils.mkdirs("/links/")
-        coreEvaluator.linkedPath="/links/"
+        coreEvaluator = CoreEvaluator(conf, params,"http://localhost:8890/sparql", scorer)
 
         //download zips and extract them
         coreEvaluator.init("/")

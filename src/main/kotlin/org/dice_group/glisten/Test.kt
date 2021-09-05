@@ -9,8 +9,10 @@ import org.dice_group.glisten.core.ConfigurationLoadException
 import org.dice_group.glisten.core.config.CONSTANTS
 import org.dice_group.glisten.core.config.Configuration
 import org.dice_group.glisten.core.config.ConfigurationFactory
+import org.dice_group.glisten.core.config.EvaluationParameters
 import org.dice_group.glisten.core.scorer.FactGenerator
 import org.dice_group.glisten.core.evaluation.CoreEvaluator
+import org.dice_group.glisten.core.evaluation.ROCCurve
 import org.dice_group.glisten.core.scorer.ScorerFactory
 import org.dice_group.glisten.core.utils.DownloadUtils
 import org.dice_group.glisten.core.utils.RDFUtils
@@ -32,7 +34,7 @@ fun main(args: Array<String>) {
 }
 
 @CommandLine.Command(name = "glisten-test", mixinStandardHelpOptions = true, version = ["glisten 1.0"],
-    description = ["Executes the glisten workflow without Hobbit and prints the ROC curve at the end. Mostly useful for debugging."])
+    description = ["Executes the glisten workflow without Hobbit and prints the ROC curve at the end. Mostly useful for debugging. Uses the load_triplestore.sh script file to upload datasets to the triplestore."])
 class Test : Callable<Int> {
 
     @CommandLine.Option(names = ["-S", "--seed"], description = ["the seed to use for anything random we do. Default=1234L"])
@@ -46,8 +48,6 @@ class Test : Callable<Int> {
 
     @CommandLine.Option(names = ["-m", "--max-recommendations"], description = ["the no. of max recommendations, 0 or lower means that all recommendations will be looked at. Default=10"])
     var maxRecommendations = 10;
-
-
 
     @CommandLine.Option(names = ["-nots", "--no-of-true-stmts"], description = ["the no. of true statements to generate. Default=5"])
     var numberOfTrueStatements = 5;
@@ -112,7 +112,8 @@ class Test : Callable<Int> {
         //create facts for source model
         val facts = createFacts(conf, evaluator, sourceModel)
         //calculate ROC (we do this outside of the CoreEvaluator as we want the ROC
-        calculateROC(evaluator, sourceFile, facts, recommendations)
+        val roc = calculateROC(evaluator, sourceFile, facts, recommendations)
+        println(roc)
 
         //cleanup -> remove testing directory
         if(cleanUp){
@@ -146,29 +147,33 @@ class Test : Callable<Int> {
     }
 
     private fun createFacts(conf: Configuration, evaluator: CoreEvaluator, sourceModel: Model): MutableList<Pair<Statement, Double>>{
-        print("[-] generating %d positive and %d negative facts now ".format(evaluator.numberOfTrueStatements, evaluator.numberOfFalseStatements))
-        val facts = FactGenerator.createFacts(evaluator.seed,
-            evaluator.numberOfTrueStatements,
-            evaluator.numberOfFalseStatements,
-            conf.createTrueStmtDrawer(evaluator.seed, sourceModel, evaluator.minPropOcc, evaluator.maxPropertyLimit),
-            conf.createFalseStmtDrawer(evaluator.seed, sourceModel, evaluator.minPropOcc, evaluator.maxPropertyLimit)
+        print("[-] generating %d positive and %d negative facts now ".format(evaluator.params.numberOfTrueStatements, evaluator.params.numberOfFalseStatements))
+        val facts = FactGenerator.createFacts(evaluator.params.seed,
+            evaluator.params.numberOfTrueStatements,
+            evaluator.params.numberOfFalseStatements,
+            conf.createTrueStmtDrawer(evaluator.params.seed, sourceModel, evaluator.params.minPropertyOccurrences, evaluator.params.maxPropertyLimit),
+            conf.createFalseStmtDrawer(evaluator.params.seed, sourceModel, evaluator.params.minPropertyOccurrences, evaluator.params.maxPropertyLimit)
         )
         //Save memory remove all statements from the source model
         sourceModel.removeAll()
-        println("\r[+] Done generating [%d positives, %d negative]facts. Facts are %s".format(evaluator.numberOfTrueStatements, evaluator.numberOfFalseStatements, facts))
+        println("\r[+] Done generating [%d positives, %d negative]facts. Facts are %s".format(evaluator.params.numberOfTrueStatements, evaluator.params.numberOfFalseStatements, facts))
         return facts
     }
 
-    private fun createEvaluator(conf: Configuration): CoreEvaluator{
+    private fun createEvaluator(conf: Configuration): CoreEvaluator {
         val scorer = ScorerFactory.createScorerOrDefault(System.getenv()[CONSTANTS.SCORER_ALGORITHM]!!, conf.namespaces)
-        val evaluator = CoreEvaluator(conf, rdfEndpoint, scorer)
-        evaluator.seed= seed
-        evaluator.maxPropertyLimit =maxPopertyLimit
-        evaluator.maxRecommendations=maxRecommendations
-        evaluator.minPropOcc=minPropOcc
-        evaluator.numberOfTrueStatements=numberOfTrueStatements
-        evaluator.numberOfFalseStatements=numberOfFalseStatements
-        return evaluator
+        val params = EvaluationParameters(
+            seed,
+            numberOfTrueStatements,
+            numberOfFalseStatements,
+            minPropOcc,
+            maxPopertyLimit,
+            maxRecommendations,
+            File("testing/links/").absolutePath,
+            CONSTANTS.SCRIPT_FILE
+        )
+
+        return CoreEvaluator(conf, params, rdfEndpoint, scorer)
     }
 
     /**
@@ -192,14 +197,16 @@ class Test : Callable<Int> {
 
     /**
      * Calculates the ROC curve
+     *
+     * @param evaluator the [CoreEvaluator] to use
+     * @param facts the facts to test against
+     * @param recommendations The recommendations to use
+     * @return the ROC curve representing the benchmark.
      */
-    private fun calculateROC(evaluator: CoreEvaluator, source: String, facts: List<Pair<Statement, Double>>, recommendations: MutableList<Pair<String, Double>>){
+    private fun calculateROC(evaluator: CoreEvaluator, source: String, facts: List<Pair<Statement, Double>>, recommendations: MutableList<Pair<String, Double>>) : ROCCurve{
         val baseline = evaluator.getScore(facts, source, "")
         println("\n[+] Baseline: %f".format(baseline))
-        evaluator.linkedPath = File("testing/links/").absolutePath
-        val roc = evaluator.getBetterROC(baseline, source, facts, recommendations)
-        //y needs to get bigger.
-        print(roc)
+        return evaluator.getBetterROC(baseline, source, facts, recommendations)
 
     }
 }

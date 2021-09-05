@@ -2,10 +2,9 @@ package org.dice_group.glisten.core.evaluation
 
 import net.lingala.zip4j.ZipFile
 import net.lingala.zip4j.exception.ZipException
-import org.apache.jena.rdf.model.ModelFactory
 import org.apache.jena.rdf.model.Statement
-import org.dice_group.glisten.core.config.CONSTANTS
 import org.dice_group.glisten.core.config.Configuration
+import org.dice_group.glisten.core.config.EvaluationParameters
 import org.dice_group.glisten.core.scorer.Copaal
 import org.dice_group.glisten.core.scorer.FactGenerator
 import org.dice_group.glisten.core.scorer.Scorer
@@ -13,8 +12,6 @@ import org.dice_group.glisten.core.utils.DownloadUtils
 import org.dice_group.glisten.core.utils.RDFUtils
 import java.io.File
 import java.io.IOException
-import java.net.URL
-import kotlin.jvm.Throws
 
 /**
  * ## Description
@@ -28,14 +25,14 @@ import kotlin.jvm.Throws
  *
  * Which will get the source file from the provided [conf] and loads the source into the provided
  * [rdfEndpoint], which resembles the SPARQL endpoint of a triplestore.
- * The source file will be loaded into the store using the script delcared at [CoreEvaluator.triplestoreLoaderScript]
+ * The source file will be loaded into the store using the script declared in the provided [EvaluationParameters.triplestoreLoaderScript]
  *
  * Using the provided [Scorer] algorithm, the baseline will be calculated using the [rdfEndpoint].
  *
  * The recommendations provided to the [getAUC] method will then be sorted after the provided values (the highest score first),
  * and for each recommendation
  * the linked dataset for that recommendation (linking source and recommendation together) will be loaded into the
- * [rdfEndpoint] and the AUC score will be calculated using the script declared in [CoreEvaluator.triplestoreLoaderScript].
+ * [rdfEndpoint] and the AUC score will be calculated using the script declared in the provided [EvaluationParameters.triplestoreLoaderScript].
  *
  * For each AUC score the algorithm will then look if the AUC score got better as the previous score.
  * If the score got better, the recommendation provided more insight and seems topical more near to the source.
@@ -85,22 +82,13 @@ import kotlin.jvm.Throws
  * println("AUC score is $auc")
  * ```
  *
- * @param conf The Configuration to use
+ * @param conf The [Configuration] to use
+ * @param params The parameters used inside the evaluation using the [EvaluationParameters]
  * @param rdfEndpoint The SPARQL endpoint to use
  * @param scorer The Scorer Algorithm to use
  */
-class CoreEvaluator(private val conf: Configuration, private val rdfEndpoint: String, private val scorer: Scorer) {
+class CoreEvaluator(private val conf: Configuration, val params: EvaluationParameters, private val rdfEndpoint: String, private val scorer: Scorer) {
 
-    var linkedPath = "./links"
-    //set max Recommendations to TOP 10
-    var maxRecommendations=10
-
-    var seed = 1234L
-    var numberOfFalseStatements = 10
-    var numberOfTrueStatements = 10
-    var minPropOcc = 1
-    var maxPropertyLimit = 30
-    var triplestoreLoaderScript = CONSTANTS.SCRIPT_FILE
 
     /**
      * Downloads the linked datasets and extract them to the linkedPath
@@ -115,8 +103,8 @@ class CoreEvaluator(private val conf: Configuration, private val rdfEndpoint: St
         val zipFile = DownloadUtils.download(conf.linksUrlZip, zipDest)
         val linksZip = ZipFile(zipFile)
         try {
-            File(linkedPath).mkdirs()
-            linksZip.extractAll(linkedPath)
+            File(params.linkedPath).mkdirs()
+            linksZip.extractAll(params.linkedPath)
         }catch(e: ZipException){
             //cleanup, delete wrong file
             File(zipFile).delete()
@@ -155,7 +143,7 @@ class CoreEvaluator(private val conf: Configuration, private val rdfEndpoint: St
      */
     fun getAUC(source: String, recommendations: MutableList<Pair<String, Double>>) : Double {
         print("[-] loading source into triplestore now")
-        RDFUtils.loadTripleStoreFromScript(source, triplestoreLoaderScript)
+        RDFUtils.loadTripleStoreFromScript(source, params.triplestoreLoaderScript)
         println("\r[+] finished loading source into triplestore.")
 
         //create source model and
@@ -163,11 +151,11 @@ class CoreEvaluator(private val conf: Configuration, private val rdfEndpoint: St
         val sourceModel = RDFUtils.streamNoLiterals(source)
 
         //create facts for source model
-        val facts = FactGenerator.createFacts(seed,
-            numberOfTrueStatements,
-            numberOfFalseStatements,
-            conf.createTrueStmtDrawer(seed, sourceModel, minPropOcc, maxPropertyLimit),
-            conf.createFalseStmtDrawer(seed, sourceModel, minPropOcc, maxPropertyLimit)
+        val facts = FactGenerator.createFacts(params.seed,
+            params.numberOfTrueStatements,
+            params.numberOfFalseStatements,
+            conf.createTrueStmtDrawer(params.seed, sourceModel, params.minPropertyOccurrences, params.maxPropertyLimit),
+            conf.createFalseStmtDrawer(params.seed, sourceModel, params.minPropertyOccurrences, params.maxPropertyLimit)
         )
         //we can now delete the sourceModel from memory
         sourceModel.removeAll()
@@ -214,7 +202,7 @@ class CoreEvaluator(private val conf: Configuration, private val rdfEndpoint: St
         var counter = 1.0
         var oldScore = baseline
         for((dataset, _) in recommendations){
-            if (counter>maxRecommendations && maxRecommendations>0){
+            if (counter > params.maxRecommendations && params.maxRecommendations > 0){
                 //if maxRecommendations > 0 and the the TOP N datasets were checked, break and return
                 break
             }
@@ -254,14 +242,14 @@ class CoreEvaluator(private val conf: Configuration, private val rdfEndpoint: St
         recommendations.sortByDescending { it.second }
         //steps doesn't ,matter in our case, we don't know the first either way
         var maxSize = recommendations.size
-        if(maxRecommendations>0) {
-            maxSize = recommendations.size.coerceAtMost(maxRecommendations)
+        if(params.maxRecommendations > 0) {
+            maxSize = recommendations.size.coerceAtMost(params.maxRecommendations)
         }
         val roc = ROCCurve(0, maxSize)
 
         var counter=1.0
         for((dataset, _) in recommendations){
-            if (counter>maxRecommendations && maxRecommendations>0){
+            if (counter > params.maxRecommendations && params.maxRecommendations > 0){
                 //if maxRecommendations > 0 and the the TOP N datasets were checked, break and return
                 return roc
             }
@@ -280,7 +268,7 @@ class CoreEvaluator(private val conf: Configuration, private val rdfEndpoint: St
      * Gets the AUC score of running [Copaal] against the combination of the current Datasets loaded into the triple store
      * and the currentDataset.
      * Will add the linked dataset `${linkedPath}/sourceName_currentDataset` to the triple store using the [RDFUtils.loadTripleStoreFromScript] method.
-     * The script which will be used is declared in [triplestoreLoaderScript]
+     * The script which will be used is declared in the provided [EvaluationParameters.triplestoreLoaderScript]
      *
      * If you want to use just the source model to generate a baseline, set the currentDataset parameter to an empty string
      *
@@ -292,9 +280,9 @@ class CoreEvaluator(private val conf: Configuration, private val rdfEndpoint: St
     fun getScore(facts: List<Pair<Statement, Double>>, sourceName: String, currentDataset: String) : Double{
         if(currentDataset.isNotEmpty()) {
             //(Download is in init)
-            val linkdataset = "${File(linkedPath).toURI()}/" + sourceName.substringAfterLast("/")
+            val linkdataset = "${File(params.linkedPath).toURI()}/" + sourceName.substringAfterLast("/")
                 .removeSuffix(".nt") + "_" + currentDataset.substringAfterLast("/")
-            RDFUtils.loadTripleStoreFromScript(linkdataset, triplestoreLoaderScript)
+            RDFUtils.loadTripleStoreFromScript(linkdataset, params.triplestoreLoaderScript)
         }
         //Let the Scorer run
         return scorer.getScore(rdfEndpoint, facts)
