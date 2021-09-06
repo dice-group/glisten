@@ -5,6 +5,7 @@ import org.apache.commons.io.FileUtils
 import org.apache.jena.rdf.model.Statement
 import org.dice_group.glisten.core.config.CONSTANTS
 import org.dice_group.glisten.core.config.Configuration
+import org.dice_group.glisten.core.config.EvaluationParameters
 import org.dice_group.glisten.core.scorer.Scorer
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -28,17 +29,17 @@ class CoreEvaluatorTest {
     fun `given an evaluator and a correct zip file the init should download and extract the zip file`(){
         val conf = createMockConfig()
         conf.linksUrlZip = File("src/test/resources/zips/correct.zip").toURI().toString()
-        val eval = CoreEvaluator(conf,"",MockupScorer(emptyList()))
-        eval.linkedPath = UUID.randomUUID().toString()
+        val eval = CoreEvaluator(conf, EvaluationParameters.createDefault(),"",MockupScorer(emptyList()))
+        eval.params.linkedPath = UUID.randomUUID().toString()
 
         val zipDest = UUID.randomUUID().toString()
         eval.init(zipDest)
 
-        val extractedFileNames = File(eval.linkedPath).listFiles()?.map { it.name }
-        assertEquals(listOf("test.txt", "file2.nt"), extractedFileNames, "ExtractingZip didn't work and the folder ${eval.linkedPath} doesn't contain the files `test.txt` and `file2.nt` ")
+        val extractedFileNames = File(eval.params.linkedPath).listFiles()?.map { it.name }
+        assertEquals(listOf("test.txt", "file2.nt"), extractedFileNames, "ExtractingZip didn't work and the folder ${eval.params.linkedPath} doesn't contain the files `test.txt` and `file2.nt` ")
 
         //cleanup
-        FileUtils.deleteDirectory(File(eval.linkedPath))
+        FileUtils.deleteDirectory(File(eval.params.linkedPath))
         FileUtils.deleteDirectory(File(zipDest))
     }
 
@@ -46,14 +47,14 @@ class CoreEvaluatorTest {
     fun `given an evaluator and a wrong zip file the init should download and extract the zip file`() {
         val conf = createMockConfig()
         conf.linksUrlZip = File("src/test/resources/zips/wrong.zip").toURI().toString()
-        val eval = CoreEvaluator(conf, "", MockupScorer(emptyList()))
-        eval.linkedPath = UUID.randomUUID().toString()
+        val eval = CoreEvaluator(conf, EvaluationParameters.createDefault(), "", MockupScorer(emptyList()))
+        eval.params.linkedPath = UUID.randomUUID().toString()
 
         val zipDest = UUID.randomUUID().toString()
         assertThrows<ZipException>{ eval.init(zipDest) }
 
         //cleanup
-        FileUtils.deleteDirectory(File(eval.linkedPath))
+        FileUtils.deleteDirectory(File(eval.params.linkedPath))
         FileUtils.deleteDirectory(File(zipDest))
     }
 
@@ -61,14 +62,14 @@ class CoreEvaluatorTest {
     fun `given an evaluator and a wrong url it should throw an IOException`() {
         val conf = createMockConfig()
         conf.linksUrlZip = File("src/test/resources/zips/doesntexists.zip").toURI().toString()
-        val eval = CoreEvaluator(conf, "", MockupScorer(emptyList()))
-        eval.linkedPath = UUID.randomUUID().toString()
+        val eval = CoreEvaluator(conf, EvaluationParameters.createDefault(), "", MockupScorer(emptyList()))
+        eval.params.linkedPath = UUID.randomUUID().toString()
 
         val zipDest = UUID.randomUUID().toString()
         assertThrows<IOException>{ eval.init(zipDest) }
 
         //cleanup
-        FileUtils.deleteDirectory(File(eval.linkedPath))
+        FileUtils.deleteDirectory(File(eval.params.linkedPath))
         FileUtils.deleteDirectory(File(zipDest))
     }
 
@@ -87,7 +88,7 @@ class CoreEvaluatorTest {
         expected: ROCCurve,
         recommendations: MutableList<Pair<String, Double>>
     ){
-        val evaluator = CoreEvaluator(conf, "", scorer)
+        val evaluator = CoreEvaluator(conf, EvaluationParameters.createDefault(), "", scorer)
         val roc = evaluator.getBetterROC(baseline, "", emptyList(), recommendations)
         assertEquals(expected, roc, "ROCCurves are not identical.")
     }
@@ -107,8 +108,8 @@ class CoreEvaluatorTest {
     ){
         File("ABCDEFGH_THIS_SHOULDNTEXSISTS.txt").deleteOnExit()
 
-        val evaluator = CoreEvaluator(createMockConfig(), "doesntmatter", scorer)
-        evaluator.triplestoreLoaderScript = "src/test/resources/scripts/write.sh"
+        val evaluator = CoreEvaluator(createMockConfig(), EvaluationParameters.createDefault(), "doesntmatter", scorer)
+        evaluator.params.triplestoreLoaderScript = "src/test/resources/scripts/write.sh"
         //we need to have an actual source here
         val source = File("src/test/resources/models/aucModel.nt").toURI().toString()
         val auc = evaluator.getAUC(source, recommendations)
@@ -124,7 +125,7 @@ class CoreEvaluatorTest {
 
             val file = recommendations[i-1].first
             //and the path as linked path! but without the file: schema
-            val path = "${File(evaluator.linkedPath).toURI().toString().replace("file:","")}/"
+            val path = "${File(evaluator.params.linkedPath).toURI().toString().replace("file:","")}/"
             //we have the link aucModel_TARGET
             assertEquals("$path aucModel_${file.substringAfterLast("/")}", lines[i])
         }
