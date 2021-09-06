@@ -87,26 +87,28 @@ class Test : Callable<Int> {
         RIOT.init()
         //read the configuration, if the config is not found or the benchmarkName doesn't exists, will throw an exception.
         val conf = ConfigurationFactory.findCorrectConfiguration(configFile, "test_benchmark")
-        //download all files
+        //download all files, this basically removes the need to call init on the CoreEvaluator
         simpleNaiveCache(conf)
 
         val recommendations = mutableListOf<Pair<String, Double>>()
-        File("testing/target/").listFiles()!!.forEach {
-            recommendations.add(Pair(it.absolutePath, 1.0))
-        }
-
-
+            File("testing/target/").listFiles()!!.forEach {
+                recommendations.add(Pair(it.absolutePath, 1.0))
+            }
         if(orderFile.isEmpty()) {
+
             //create random order (it really doesn't matter tbh)
             recommendations.shuffle(Random(seed))
-        }else{
+        }
+        else{
             orderRecommendations(recommendations, orderFile)
         }
 
+
         //Set parameters
         val evaluator = createEvaluator(conf)
-        evaluator.init("/tmp/")
+        //evaluator.init("/tmp/")
         val sourceFile = conf.sources[0]
+        RDFUtils.loadTripleStoreFromScript(sourceFile, evaluator.params.triplestoreLoaderScript)
 
         //create source model for fact generation
         println("[+] reading source Model now")
@@ -127,26 +129,31 @@ class Test : Callable<Int> {
         return 0
     }
 
+
     /**
      * Will order the recommendations according to the order file
      *
-     * Each file in the recommendations needs to be in the order file and each file per line
-     */
+     * If a recommendation is not in the file, it will simply be appended at the end
+     *
+     * */
     private fun orderRecommendations(recommendations: MutableList<Pair<String, Double>>, orderFile: String) {
         //create order map for lookup
-        val orderMap = mutableMapOf<String, Int>()
-        org.apache.commons.io.FileUtils.readLines(File(orderFile)).forEachIndexed { index, s -> orderMap[s] = index }
-        try   {
-        recommendations.sortWith(Comparator { recom1, recom2 ->
-            orderMap[recom1.first.substringAfterLast("/")]!!.compareTo(
-                orderMap[recom2.first.substringAfterLast("/")]!!
-            )
-        })
-        }catch(e : Exception){
-            //if the order doesn't contain a string
-            //just ignore the ordering
-            System.err.println("Order file is incomplete. Will use native file reading order.")
-        }
+        val orderMap = mutableMapOf<String, Double>()
+        var index=0
+        org.apache.commons.io.FileUtils.readFileToString(File(orderFile)).split("\n")
+                .forEach { s -> orderMap[s.trim().substringAfterLast("/")] = recommendations.size-index.toDouble(); index++ }
+        val orderedRecomms = mutableListOf<Pair<String, Double>>()
+
+            recommendations.forEach {
+                val name = it.first.substringAfterLast("/")
+                //every file which is not mentioned is just appended at the end
+                val score = orderMap[name]?:0.0
+                orderedRecomms.add(Pair(it.first, score))
+            }
+            //we now need to set the ordered recomms.
+            recommendations.clear()
+            recommendations.addAll(orderedRecomms)
+
     }
 
     private fun createFacts(conf: Configuration, evaluator: CoreEvaluator, sourceModel: Model): MutableList<Pair<Statement, Double>>{

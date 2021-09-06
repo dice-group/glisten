@@ -40,7 +40,7 @@ class Copaal(namespaces: List<String>) : Scorer(namespaces){
     private fun createFactChecker(endpoint: String, namespaces: List<String>): IFactChecker{
         var qef : QueryExecutionFactory = QueryExecutionFactoryHttp(endpoint)
         qef = QueryExecutionFactoryDelay(qef, 200L)
-        qef = QueryExecutionFactoryTimeout(qef, 30L, TimeUnit.SECONDS, 30L, TimeUnit.SECONDS)
+        qef = QueryExecutionFactoryTimeout(qef, 60L, TimeUnit.SECONDS, 60L, TimeUnit.SECONDS)
 
         return PathBasedFactChecker(
             PredicateFactory(qef),
