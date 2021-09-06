@@ -113,9 +113,10 @@ class Test : Callable<Int> {
         val sourceModel = RDFUtils.streamNoLiterals(sourceFile)
         //create facts for source model
         val facts = createFacts(conf, evaluator, sourceModel)
-        //calculate ROC (we do this outside of the CoreEvaluator as we want the ROC
+        //calculate ROC (we do this outside of the CoreEvaluator as we want the ROC printed as well.
         val roc = calculateROC(evaluator, sourceFile, facts, recommendations)
-        println(roc)
+        println("[+] ROC Curve created: $roc")
+        println("[+] Area under the curve: ${roc.calculateAUC()}")
 
         //cleanup -> remove testing directory
         if(cleanUp){
