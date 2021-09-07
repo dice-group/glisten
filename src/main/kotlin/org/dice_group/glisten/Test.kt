@@ -39,8 +39,8 @@ fun main(args: Array<String>) {
     description = ["Executes the glisten workflow without Hobbit and prints the ROC curve at the end. Mostly useful for debugging. Uses the load_triplestore.sh script file to upload datasets to the triplestore."])
 class Test : Callable<Int> {
 
-    @CommandLine.Option(names = ["-S", "--seed"], description = ["the seed to use for anything random we do. Default=1234L"])
-    var seed = 1234L
+    @CommandLine.Option(names = ["-S", "--seed"], description = ["the seed to use for anything random we do. Default is random"])
+    var seed = System.currentTimeMillis()
 
     @CommandLine.Option(names = ["--max-property-limit"], description = ["the maximum a property is allowed to be added for performance reasons. Default=30"])
     var maxPropertyLimit = 30;
@@ -92,6 +92,9 @@ class Test : Callable<Int> {
         RIOT.init()
         //read the configuration, if the config is not found or the benchmarkName doesn't exists, will throw an exception.
         val conf = ConfigurationFactory.findCorrectConfiguration(configFile, benchmarkName)
+
+        println("[+] Will use seed: $seed")
+
         //download all files, this basically removes the need to call init on the CoreEvaluator
         simpleNaiveCache(conf)
 
