@@ -18,6 +18,32 @@ Glisten then goes through the ranking, and adds one the recommendations after an
 
 To take this into account, Glisten uses a ROC curve and the corresponding AUC score as how good the recommendation system is. Each time the score gets better the ROC curve gets better, and hence the overall AUC score.
 
+### More indepth Idea
+
+A Benchmark in Glisten is defined to check one or more source datasets against several target datasets. 
+For each source dataset a recommendation system should get a score for each target dataset representing how well this dataset fits to the source.
+
+Hence we get a ranking of the target datasets from best fitting to least fitting.
+
+
+Glisten then uses Fact Checking to check if the ranking puts all the relevant datasets on top. 
+
+It will generate some true and some wrong facts from the source dataset.
+
+
+Now using these facts the Fact Checking system will be used to check each fact against the source dataset. 
+This represents the baseline.
+
+Now we add the highest ranked target dataset and check again. 
+Ideally the fact checker could declare more true facts true and more wrong facts wrong. 
+The fact checking score rises. 
+
+Hence if the recommendation system rates the better fitting target datasets higher, the score the system will retrieve will be better than
+if the system ranks low fitting target datasets higher. 
+
+
+> A small Note! We don't directly add the target, but a precomputed linked dataset of the target with the source file (It contains the target, but also the links between the source and the target)
+
 
 ## What is Hobbit?
 
