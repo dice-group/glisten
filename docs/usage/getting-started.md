@@ -52,7 +52,8 @@ Usage: glisten-test [-hV] [--clean-up] [-c=<configFile>]
                     [--max-property-limit=<maxPropertyLimit>]
                     [--min-prop-occ=<minPropOcc>] [-N=<benchmarkName>]
                     [-o=<orderFile>] [-s=<scorerAlgorithm>] [-S=<seed>]
-                    [-t=<threshold>] [-T=<numberOfTrueStatements>] <rdfEndpoint>
+                    [--sample-size=<sampleSize>] [-t=<threshold>]
+                    [-T=<numberOfTrueStatements>] <rdfEndpoint>
 Executes the glisten workflow without Hobbit and prints the ROC curve at the
 end. Mostly useful for debugging. Uses the load_triplestore.sh script file to
 upload datasets to the triplestore.
@@ -80,8 +81,12 @@ upload datasets to the triplestore.
                       A file containing the order of the recommendations, if
                         not set, will be random
   -s, --scorer=<scorerAlgorithm>
-                      The Scorer algorithm to use. Algorithms: [Copaal]
-  -S, --seed=<seed>   the seed to use for anything random we do. Default is random
+                      The Scorer algorithm to use. Algorithms: [Copaal,
+                        SampleCopaal]
+  -S, --seed=<seed>   the seed to use for anything random we do. Default is
+                        random
+      --sample-size=<sampleSize>
+                      the sample size to use if Scorer uses samples. Default=30
   -t, --scorer-threshold=<threshold>
                       the threshold to use inside the scorer. A true fact needs
                         to be better than the threshold. Default=0.0

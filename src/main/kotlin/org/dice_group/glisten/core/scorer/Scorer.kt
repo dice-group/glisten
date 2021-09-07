@@ -126,12 +126,15 @@ object ScorerFactory{
      *
      * @param scorerAlgorithm The name of the scorer algorithm e.g COPAAL
      * @param namespaces The list of namespaces which should be used
+     * @param seed seed to use for any random activity
+     * @param sampleSize If the Scorer uses samples, describes the sample size
      * @return The Scorer Algorithm with the name or the Default scorer algorithm: Copaal
      */
-    fun createScorerOrDefault(scorerAlgorithm: String, namespaces: List<String>) : Scorer  {
+    fun createScorerOrDefault(scorerAlgorithm: String, namespaces: List<String>, seed: Long, sampleSize: Int) : Scorer  {
         var scorer : Scorer = Copaal(namespaces)
         when(scorerAlgorithm.lowercase(Locale.getDefault())){
             "copaal" -> scorer = Copaal(namespaces)
+            "samplecopaal" -> scorer = SampleCopaal(seed, sampleSize, namespaces)
         }
         return scorer
     }

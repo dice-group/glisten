@@ -21,7 +21,10 @@ package org.dice_group.glisten.core.config
  */
 object CONSTANTS {
 
+
+
     //Some default values for the configuration and hobbit
+
     const val SCRIPT_FILE = "./load_triplestore.sh"
     const val MAX_RECOMMENDATIONS = "maxRecommendations"
     const val STMTDRAWER_TYPE = "stmtDrawerType"
@@ -35,5 +38,5 @@ object CONSTANTS {
     const val MIN_PROP_OCC = "minPropOcc"
     const val MAX_PROPERTY_LIMIT = "maxPropertyLimit"
     const val SCORER_ALGORITHM = "scorerAlgorithm"
-
+    const val SAMPLE_SIZE= "sampleSize"
 }

@@ -70,12 +70,16 @@ class Evaluator : AbstractEvaluationModule() {
         if(System.getenv().containsKey(CONSTANTS.MAX_RECOMMENDATIONS)){
             params.maxRecommendations = System.getenv()[CONSTANTS.MAX_RECOMMENDATIONS]!!.toInt()
         }
+        var sampleSize = 30
+        if(System.getenv().containsKey(CONSTANTS.SAMPLE_SIZE)){
+            sampleSize = System.getenv()[CONSTANTS.SAMPLE_SIZE]!!.toInt()
+        }
         if(System.getenv().containsKey(CONSTANTS.SEED)){
             params.seed = System.getenv()[CONSTANTS.SEED]!!.toLong()
         }
         var scorer : Scorer = Copaal(conf.namespaces)
         if(System.getenv().containsKey(CONSTANTS.SCORER_ALGORITHM)){
-            scorer = ScorerFactory.createScorerOrDefault(System.getenv()[CONSTANTS.SCORER_ALGORITHM]!!, conf.namespaces)
+            scorer = ScorerFactory.createScorerOrDefault(System.getenv()[CONSTANTS.SCORER_ALGORITHM]!!, conf.namespaces, params.seed, sampleSize)
         }
         params.linkedPath="/links/"
         FileUtils.mkdirs("/links/")

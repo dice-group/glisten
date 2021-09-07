@@ -54,7 +54,7 @@ This step is pretty basic and you only need to name your algorithm like `MyScore
 Inside the `ScorerFactory` in `org.dice_group.glisten.core.scorer.Scorer.kt` add to the createOrDefault method your scorer name like
 
 ```kotlin
-    fun createScorerOrDefault(scorerAlgorithm: String, namespaces: List<String>) : Scorer  {
+    fun createScorerOrDefault(scorerAlgorithm: String, namespaces: List<String>, seed: Long, sampleSize: Int) : Scorer  {
         var scorer : Scorer = Copaal(namespaces)
         when(scorerAlgorithm.lowercase(Locale.getDefault())){
             "copaal" -> scorer = Copaal(namespaces)
@@ -69,10 +69,12 @@ Inside the `ScorerFactory` in `org.dice_group.glisten.core.scorer.Scorer.kt` add
 
 and add your Scorer name to the KDoc. 
 
+Here you can see that you'll get some namespaces and a seed and a sampleSize if your algorithm needs that.
+
 
 Additionally you should add the name to the `Test.kt` file so Users can know that they can use your scorer.
 
-Do this by simply adding it to the Option description of the `scorerAlgorithm`  parameter like "The Scorer algorithm to use. Algorithms: [Copaal, MyScorer2000]"
+Do this by simply adding it to the Option description of the `scorerAlgorithm`  parameter like "The Scorer algorithm to use. Algorithms: [Copaal, SampleCopaal, MyScorer2000]"
 
 
 ### Add your Scorer to Hobbit.

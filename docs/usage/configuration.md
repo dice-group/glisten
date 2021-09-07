@@ -111,7 +111,7 @@ The parameters are listed in the following table
 | minimum property occurrences | The minimum amount a property has to occur in the dataset to be considered for fact generation | 10 |
 | max property limit | The max amount a property is retrieved for fact generation, if more facts are available will choose randomly the amount of facts. | 30 | 
 | max recommendations | Only check against the Top N recommendations (For performance reasons) | 10 |
-| Scorer Algorithm | The Fact Checking algorithm. Currently implemented: [COPAAL] | COPAAL |
+| Scorer Algorithm | The Fact Checking algorithm. Currently implemented: [COPAAL, SampleCOPAAL] | COPAAL |
 | Scorer threshold | The threshold to consider a true fact actually true. F.e. the scorer might state the true fact at 0.01, but that is not sufficient, we want at least a score of 0.2 to consider the fact true. This will put true facts behind false facts who are mostly at 0.0. This is more for debugging purposes . | 0.0 |
 | number Of True Statements | The no. of true facts to generate | 5 |
 | number Of False Statements | The no. of false facts to generate | 5 | 

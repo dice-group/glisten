@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit
  *
  * @param namespaces The namespaces to consider while fact checking.
  */
-class Copaal(namespaces: List<String>) : Scorer(namespaces){
+open class Copaal(namespaces: List<String>) : Scorer(namespaces){
 
     /**
      * Creates a COPAAL [PathBasedFactChecker] using an [QueryExecutionFactoryHttp] with a delay of 200ms and a timeout of 30s
@@ -38,7 +38,7 @@ class Copaal(namespaces: List<String>) : Scorer(namespaces){
      * @param endpoint the SPARQL endpoint to use
      * @param namespaces the allowed namespaces, if empty will allow all namespaces
      */
-    private fun createFactChecker(endpoint: String, namespaces: List<String>): IFactChecker{
+    open fun createFactChecker(endpoint: String, namespaces: List<String>): IFactChecker{
         var qef : QueryExecutionFactory = QueryExecutionFactoryHttp(endpoint)
         qef = QueryExecutionFactoryDelay(qef, 200L)
         qef = QueryExecutionFactoryTimeout(qef, 30L, TimeUnit.SECONDS, 30L, TimeUnit.SECONDS)
