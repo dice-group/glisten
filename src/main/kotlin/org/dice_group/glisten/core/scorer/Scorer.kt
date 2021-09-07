@@ -18,6 +18,7 @@ import org.dice_group.glisten.core.evaluation.ROCCurve
  */
 abstract class Scorer(val namespaces: List<String>) {
 
+    var threshold = 0.0
 
     /**
      * Calculates the AUC from calculating the scores for each fact.
@@ -37,7 +38,14 @@ abstract class Scorer(val namespaces: List<String>) {
         //get the actual score
         val scores = getScores(endpoint, facts)
         //sort by veracity score s.t. the highest score is on top
-        scores.sortByDescending { it.second }
+        scores.sortByDescending {
+            if(it.first == 1.0){
+                it.second-threshold
+            }
+            else{
+                it.second
+            }
+        }
 
         return getAUC(scores)
     }

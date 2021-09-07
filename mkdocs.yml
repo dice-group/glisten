@@ -45,8 +45,8 @@ theme:
 
 
 
-repo_url: https://github.com/dice-group/LPBenchGen
-repo_name: dice-group/LPBenchGen
+repo_url: https://github.com/dice-group/Glisten
+repo_name: dice-group/Glisten
 
 plugins:
   - macros

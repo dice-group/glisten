@@ -51,6 +51,9 @@ class Test : Callable<Int> {
     @CommandLine.Option(names = ["-m", "--max-recommendations"], description = ["the no. of max recommendations, 0 or lower means that all recommendations will be looked at. Default=10"])
     var maxRecommendations = 10;
 
+    @CommandLine.Option(names = ["-t", "--scorer-threshold"], description = ["the threshold to use inside the scorer. A true fact needs to be better than the threshold. Default=0.0"])
+    var threshold = 0.0;
+
     @CommandLine.Option(names = ["-T", "--no-of-true-stmts"], description = ["the no. of true statements to generate. Default=5"])
     var numberOfTrueStatements = 5;
 
@@ -69,6 +72,8 @@ class Test : Callable<Int> {
     @CommandLine.Option(names = ["-s", "--scorer"], description = ["The Scorer algorithm to use. Algorithms: [Copaal] "])
     var scorerAlgorithm = "Copaal"
 
+    @CommandLine.Option(names = ["-N", "--benchmark-name"], description = ["The name of the benchmark to use. Name is specified inside the given configuration file."])
+    var benchmarkName = "test_benchmark"
 
 
     @CommandLine.Option(names = ["--clean-up"], description = ["if set, will remove the testing directory which includes all downloaded and extracted datasets."])
@@ -86,7 +91,7 @@ class Test : Callable<Int> {
         ARQ.init()
         RIOT.init()
         //read the configuration, if the config is not found or the benchmarkName doesn't exists, will throw an exception.
-        val conf = ConfigurationFactory.findCorrectConfiguration(configFile, "test_benchmark")
+        val conf = ConfigurationFactory.findCorrectConfiguration(configFile, benchmarkName)
         //download all files, this basically removes the need to call init on the CoreEvaluator
         simpleNaiveCache(conf)
 
@@ -172,6 +177,7 @@ class Test : Callable<Int> {
 
     private fun createEvaluator(conf: Configuration): CoreEvaluator {
         val scorer = ScorerFactory.createScorerOrDefault(scorerAlgorithm, conf.namespaces)
+        scorer.threshold = threshold
         val params = EvaluationParameters(
             seed,
             numberOfTrueStatements,

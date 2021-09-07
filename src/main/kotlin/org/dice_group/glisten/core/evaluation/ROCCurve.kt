@@ -156,6 +156,9 @@ class ROCCurve(private val trueStmts: Int, private val falseStmts: Int) {
                 auc += aup
             }
         }
+        if(auc.isNaN()){
+            println("\n[!!] NaN found: $points")
+        }
         return auc
     }
 

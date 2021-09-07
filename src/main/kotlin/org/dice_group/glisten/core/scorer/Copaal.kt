@@ -65,7 +65,7 @@ class Copaal(namespaces: List<String>) : Scorer(namespaces){
         val scores = mutableListOf<Pair<Double, Double>>()
         for((fact, value) in facts ){
             print("[-] checking fact %s".format(fact))
-            val veracity = try {
+            var veracity = try {
                 val factscore = checker.check(fact)
                 factscore.veracityValue
             }catch (e: Exception){
@@ -73,7 +73,11 @@ class Copaal(namespaces: List<String>) : Scorer(namespaces){
                 e.printStackTrace()
                 0.0
             }
+            if(veracity.isNaN()){
+                veracity = 0.0
+            }
             println("\r[+] checking fact %s , score %f, orig %f".format(fact, veracity, value))
+
             //add the pair original trueness value and the veracity score (we need the latter one simply for sorting later on)
             val ret = Pair(value, veracity)
             scores.add(ret)
