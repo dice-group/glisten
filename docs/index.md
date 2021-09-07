@@ -46,7 +46,7 @@ cd Glisten
 mvn clean package
 
 # Execute the Help option to see what you can do
-java -jar glisten-test-${VERSION}.jar -h
+java -jar glisten-test-{{ release_version }}.jar -h
 
 ```
 
@@ -56,9 +56,9 @@ The help execution will print this screen.
 Usage: glisten-test [-hV] [--clean-up] [-c=<configFile>]
                     [-F=<numberOfFalseStatements>] [-m=<maxRecommendations>]
                     [--max-property-limit=<maxPropertyLimit>]
-                    [--min-prop-occ=<minPropOcc>] [-o=<orderFile>]
-                    [-s=<scorerAlgorithm>] [-S=<seed>] [-t=<threshold>]
-                    [-T=<numberOfTrueStatements>] <rdfEndpoint>
+                    [--min-prop-occ=<minPropOcc>] [-N=<benchmarkName>]
+                    [-o=<orderFile>] [-s=<scorerAlgorithm>] [-S=<seed>]
+                    [-t=<threshold>] [-T=<numberOfTrueStatements>] <rdfEndpoint>
 Executes the glisten workflow without Hobbit and prints the ROC curve at the
 end. Mostly useful for debugging. Uses the load_triplestore.sh script file to
 upload datasets to the triplestore.
@@ -79,6 +79,9 @@ upload datasets to the triplestore.
       --min-prop-occ=<minPropOcc>
                       the minimum a property has to occur to be considered for
                         the fact generation. Default=10
+  -N, --benchmark-name=<benchmarkName>
+                      The name of the benchmark to use. Name is specified
+                        inside the given configuration file.
   -o, --order-file=<orderFile>
                       A file containing the order of the recommendations, if
                         not set, will be random
@@ -91,8 +94,6 @@ upload datasets to the triplestore.
   -T, --no-of-true-stmts=<numberOfTrueStatements>
                       the no. of true statements to generate. Default=5
   -V, --version       Print version information and exit.
-
-
 ```
 
 
