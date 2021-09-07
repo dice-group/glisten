@@ -75,6 +75,17 @@ Additionally you should add the name to the `Test.kt` file so Users can know tha
 Do this by simply adding it to the Option description of the `scorerAlgorithm`  parameter like "The Scorer algorithm to use. Algorithms: [Copaal, MyScorer2000]"
 
 
+### Add your Scorer to Hobbit.
+
+If you want to use the Scorer inside Hobbit, you need to add the Scorer to the `benchmark.ttl` inside the Glisten Hobbit repository at [TODO]().
+
+Add the following to the `benchmark.ttl`
+
+```ttl
+TODO
+```
+
+
 ## Add your own Fact Generation Base List
 
 Create a fact generation base list (or Statmenet Drawer) like the Allow list or Block list 
