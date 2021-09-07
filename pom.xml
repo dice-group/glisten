@@ -304,7 +304,7 @@
                                 <transformer implementation=
                                                      "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <!--<mainClass>org.dice_group.glisten.TestKt</mainClass>-->
-                                    <mainClass>org.dice_group.glisten.core.scorer.CopaalKt</mainClass>
+                                    <mainClass>org.dice_group.glisten.TestKt</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

@@ -224,6 +224,7 @@ class CoreEvaluator(private val conf: Configuration, val params: EvaluationParam
             oldScore = score
             counter += 1.0
         }
+        println(directions)
         //now we can calculate the upwards steps and rightwards steps
         val upCount = directions.count {it == DIRECTION.UP}
         val rightCount = directions.count {it == DIRECTION.RIGHT}

@@ -8,6 +8,7 @@ import org.apache.jena.rdf.model.Statement
 import org.dice_research.fc.IFactChecker
 import org.dice_research.fc.paths.PathBasedFactChecker
 import org.dice_research.fc.paths.PredicateFactory
+import org.dice_research.fc.paths.scorer.ICountRetriever
 import org.dice_research.fc.paths.scorer.NPMIBasedScorer
 import org.dice_research.fc.paths.scorer.count.PropPathBasedPairCountRetriever
 import org.dice_research.fc.paths.scorer.count.decorate.CachingCountRetrieverDecorator
@@ -40,10 +41,10 @@ class Copaal(namespaces: List<String>) : Scorer(namespaces){
     private fun createFactChecker(endpoint: String, namespaces: List<String>): IFactChecker{
         var qef : QueryExecutionFactory = QueryExecutionFactoryHttp(endpoint)
         qef = QueryExecutionFactoryDelay(qef, 200L)
-        qef = QueryExecutionFactoryTimeout(qef, 60L, TimeUnit.SECONDS, 60L, TimeUnit.SECONDS)
+        qef = QueryExecutionFactoryTimeout(qef, 30L, TimeUnit.SECONDS, 30L, TimeUnit.SECONDS)
 
         return PathBasedFactChecker(
-            PredicateFactory(qef),
+            NamespaceBasedPredicateFactory(namespaces, qef),
             SPARQLBasedSOPathSearcher(
                 qef,
                 3,
@@ -79,9 +80,43 @@ class Copaal(namespaces: List<String>) : Scorer(namespaces){
         }
        return scores
     }
+}
 
+/**
+ * A Predicate Factory allowing domain and ranges only if they are within one of the provided namespaces
+ *
+ * @param namespaces The namespaces which are allowd
+ * @param qef The QUeryExecutionFactory to execute queries against
+ */
+class NamespaceBasedPredicateFactory(private val namespaces: List<String>, qef: QueryExecutionFactory) : PredicateFactory(qef){
 
+    override fun getDomain(triple: Statement?): MutableSet<String> {
+        return super.getDomain(triple).filter {
+            isInNamespace(it)
+        }.toMutableSet()
+    }
 
+    override fun getRange(triple: Statement?): MutableSet<String> {
+        return super.getRange(triple).filter {
+            isInNamespace(it)
+        }.toMutableSet()
+    }
+
+    /**
+     * Checks if the iri string is in one of the given [namespaces]
+     *
+     * @param iri String to check if it is inside one of the namespaces
+     * @return true if [iri] is in one of the namespaces, false otherwise
+     */
+    private fun isInNamespace(iri: String) : Boolean{
+        var check = false
+        namespaces.forEach {
+            if(iri.startsWith(it)) {
+                check = true
+            }
+        }
+        return check
+    }
 }
 
 /**

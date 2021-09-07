@@ -75,7 +75,6 @@ abstract class Scorer(val namespaces: List<String>) {
                 roc.addRight()
             }
         }
-        println(roc)
         return roc.calculateAUC()
 
     }

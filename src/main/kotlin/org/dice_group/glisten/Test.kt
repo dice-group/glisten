@@ -51,10 +51,10 @@ class Test : Callable<Int> {
     @CommandLine.Option(names = ["-m", "--max-recommendations"], description = ["the no. of max recommendations, 0 or lower means that all recommendations will be looked at. Default=10"])
     var maxRecommendations = 10;
 
-    @CommandLine.Option(names = ["-nots", "--no-of-true-stmts"], description = ["the no. of true statements to generate. Default=5"])
+    @CommandLine.Option(names = ["-T", "--no-of-true-stmts"], description = ["the no. of true statements to generate. Default=5"])
     var numberOfTrueStatements = 5;
 
-    @CommandLine.Option(names = ["-nofs", "--no-of-false-stmts"], description = ["the no. of false statements to generate. Default=5"])
+    @CommandLine.Option(names = ["-F", "--no-of-false-stmts"], description = ["the no. of false statements to generate. Default=5"])
     var numberOfFalseStatements = 5;
 
     @CommandLine.Parameters(description = ["the rdf endpoint to use"])
