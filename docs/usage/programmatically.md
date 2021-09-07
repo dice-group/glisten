@@ -1,7 +1,8 @@
 In this section we go through Glisten as a library. 
 
-We will discuss examples on how to use the Glisten core insider your application or how you can extend Glisten to your needs.
+We will discuss examples on how to use the Glisten core insider your application.
 
+If you want to exend glisten hava a look at our develop section.
 
 Glisten was programmed in Kotlin and is thus accessible in Java as well. 
 It is advised to use Kotlin however.

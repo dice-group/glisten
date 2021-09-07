@@ -2,6 +2,7 @@ package org.dice_group.glisten.core.scorer
 
 import org.apache.jena.rdf.model.Statement
 import org.dice_group.glisten.core.evaluation.ROCCurve
+import java.util.*
 
 /**
  * ## Description
@@ -129,7 +130,7 @@ object ScorerFactory{
      */
     fun createScorerOrDefault(scorerAlgorithm: String, namespaces: List<String>) : Scorer  {
         var scorer : Scorer = Copaal(namespaces)
-        when(scorerAlgorithm){
+        when(scorerAlgorithm.lowercase(Locale.getDefault())){
             "copaal" -> scorer = Copaal(namespaces)
         }
         return scorer

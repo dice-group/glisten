@@ -1,9 +1,81 @@
 This section explains how to change and extend the Core library.
 
+## Add your own Scorer
+
+Create your Scorer Algorithm to use inside glisten.
+
+You need to 
+
+1. Create your Scorer Algorithm
+2. Add the Algorithm to the ScorerFactory
+
+### Create your Scorer Algorithm
+
+To create your `Scorer` simply extend the `Scorer` class located in `org.dice_group.glisten.core.scorer`  and you  only need to implement one function
+
+```
+class MyScorer2000(namespaces: List<String>)  : Scorer(namespaces){
 
 
+    /**
+     * Gets the Scores for each Fact as a Pair whereas the returned Pairs consists of the original trueness Value as the first element
+     * and the score as the second.
+     *
+     * @param endpoint the rdf endpoint to use
+     * @param facts the facts to calculate the scores against, each pair consists of the statement and its trueness value
+     *
+     * @return a list of pairs containing the trueness value of the fact and the score
+     */
+    override fun getScores(endpoint: String, facts: List<Pair<Statement, Double>>): MutableList<Pair<Double, Double>>{
 
-## Add my own Fact Generation Base List
+        //TODO
+
+    }
+
+
+}
+
+```
+
+As you can see you need to extend the `getScores` function, you get some facts and a SPARQL endpoint provided and you should create a list of Pairs representing the trueness value and your score. 
+
+In other words if the fact at position 4 looks is `Statement, 1.0` and your score for that Statement is f.e. `0.4`, 
+
+then the list you're returing has to have the Pair `1.0, 0.4` at position `4`.
+
+
+That's it now let's add your Scorer algorithm to the `ScorerFactory` so we can use it by simply stating it in the Evaluation parameters.
+
+
+### Add you Scorer to the ScorerFactory 
+
+This step is pretty basic and you only need to name your algorithm like `MyScorer2000`. 
+
+Inside the `ScorerFactory` in `org.dice_group.glisten.core.scorer.Scorer.kt` add to the createOrDefault method your scorer name like
+
+```kotlin
+    fun createScorerOrDefault(scorerAlgorithm: String, namespaces: List<String>) : Scorer  {
+        var scorer : Scorer = Copaal(namespaces)
+        when(scorerAlgorithm.lowercase(Locale.getDefault())){
+            "copaal" -> scorer = Copaal(namespaces)
+
+            "myscorer2000" -> scorer = MyScorer2000(namespaces)
+
+        }
+        return scorer
+    }
+
+```
+
+and add your Scorer name to the KDoc. 
+
+
+Additionally you should add the name to the `Test.kt` file so Users can know that they can use your scorer.
+
+Do this by simply adding it to the Option description of the `scorerAlgorithm`  parameter like "The Scorer algorithm to use. Algorithms: [Copaal, MyScorer2000]"
+
+
+## Add your own Fact Generation Base List
 
 Create a fact generation base list (or Statmenet Drawer) like the Allow list or Block list 
 
