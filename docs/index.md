@@ -87,7 +87,7 @@ upload datasets to the triplestore.
                         not set, will be random
   -s, --scorer=<scorerAlgorithm>
                       The Scorer algorithm to use. Algorithms: [Copaal]
-  -S, --seed=<seed>   the seed to use for anything random we do. Default=1234L
+  -S, --seed=<seed>   the seed to use for anything random we do. Default is random
   -t, --scorer-threshold=<threshold>
                       the threshold to use inside the scorer. A true fact needs
                         to be better than the threshold. Default=0.0
