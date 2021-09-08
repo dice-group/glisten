@@ -31,13 +31,13 @@ class SampleCopaal(private val seed : Long, private val sampleSize: Int, namespa
                     NamespaceFilter(namespaces)
                 )
             ),
-            NPMIBasedScorer(CachingCountRetrieverDecorator(
+            NPMIBasedScorer(
                 SamplingCountRetrieverDecorator(PropPathBasedPairCountRetriever(qef, DefaultMaxCounter(qef)),
                 seed,
                 sampleSize,
                 qef
             )
-            )),
+            ),
             FixedSummarist()
         )
     }

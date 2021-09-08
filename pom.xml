@@ -6,16 +6,27 @@
 
     <groupId>org.dice_group</groupId>
     <artifactId>glisten</artifactId>
-    <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-
+    <version>${major.minor.version}.${build.version}</version>
 
     <properties>
+        <major.minor.version>${major.version}.${minor.version}</major.minor.version>
+        <major.version>1</major.version>
+        <minor.version>0</minor.version>
+        <build.version>0-SNAPSHOT</build.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <kotlin.version>1.5.10</kotlin.version>
     </properties>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/dice-group/Glisten</url>
+        </repository>
+    </distributionManagement>
 
     <repositories>
     <repository>

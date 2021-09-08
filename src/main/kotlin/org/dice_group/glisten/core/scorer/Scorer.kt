@@ -134,7 +134,7 @@ object ScorerFactory{
         var scorer : Scorer = Copaal(namespaces)
         when(scorerAlgorithm.lowercase(Locale.getDefault())){
             "copaal" -> scorer = Copaal(namespaces)
-            "samplecopaal" -> scorer = SampleCopaal(seed, sampleSize, namespaces)
+            "samplecopaal" -> {println("[+] Using SampleCopaal"); scorer = SampleCopaal(seed, sampleSize, namespaces)}
         }
         return scorer
     }

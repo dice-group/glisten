@@ -1,6 +1,9 @@
 # Compiled class file
 *.class
 
+site*
+
+.site/*
 # Log file
 *.log
 
