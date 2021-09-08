@@ -54,7 +54,7 @@ It deploys a platform [https://master.project-hobbit.eu](https://master.project-
 
 The glisten benchmark is integrated into the platform and can be easily executed inside hobbit, without setting anything up. 
 
-If you want to deploy your Recommendation System to be used in Hobbit, have a look at: [How to add my Recommendation System to Hobbit]
+If you want to deploy your Recommendation System to be used in Hobbit, have a look at: [How to add my System to Hobbit](usage/hobbit#how-to-add-my-own-system)
 
 
 ## How to use the local benchmark execution?
@@ -128,7 +128,7 @@ upload datasets to the triplestore.
 ```
 
 
-Have a look on [how to setup a benchark] for further information.
+Have a look at [Configuration](usage/configuration) for further information.
 
 
 

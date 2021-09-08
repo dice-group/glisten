@@ -39,7 +39,7 @@ Now that Glisten is build we can execute it.
 For clarification let's move the execution jar file to our current directory
 
 ```bash
-mv target/glisten-test-1.0-SNAPSHOT ./
+mv target/glisten-test-{{ release_version }} ./
 ```
 
 In the following steps the execution of the benchmark is declared. 
@@ -171,13 +171,13 @@ For no we will assume that the SPARQL endpoint is at `http://localhost:8890/spar
 Now that we have glisten build, a benchmark choosen, the triplestore set up and optionally an order file, we can execute the benchmark
 
 ```
-java -jar glisten-test-1.0-SNAPSHOT.jar -o recommendations_order.txt -N MySimpleBenchmark http://localhost:8890/sparql
+java -jar glisten-test-{{ release_version }}.jar -o recommendations_order.txt -N MySimpleBenchmark http://localhost:8890/sparql
 ```
 
 or if you do not have an order file
 
 ```
-java -jar glisten-test-1.0-SNAPSHOT.jar -N MySimpleBenchmark http://localhost:8890/sparql
+java -jar glisten-test-{{ release_version }}.jar -N MySimpleBenchmark http://localhost:8890/sparql
 ```
 
 
