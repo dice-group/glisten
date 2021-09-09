@@ -33,14 +33,14 @@ jobs:
       - run: sed -i "s/\$VERSION/$(cat version.log)/g" mkdocs.yml
       - run: sed -i "s/\$RELEASE_VERSION/${{ env.RELEASE_VERSION }}/g" mkdocs.yml
       - run: mkdocs build
-      - run: mvn javadoc:javadoc
+      - run: mvn pre-site
       - name: Deploy Site
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./site/${{ env.MM_VERSION }}
           destination_dir: ./
-      - run: mvn package -Dmaven.test.skip=true
+      - run: mvn package -Dmaven.test.skip=true -P shaded
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -57,10 +57,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./target/${{ env.RELEASE_ARTIFACTID }}-${{ env.RELEASE_VERSION }}-shaded.jar
+          asset_path: ./target/${{ env.RELEASE_ARTIFACTID }}-test-${{ env.RELEASE_VERSION }}.jar
           asset_name: glisten-${{ env.RELEASE_VERSION }}.jar
           asset_content_type: application/zip
       - name: Publish package
-        run: mvn --batch-mode deploy
+        run: mvn --batch-mode clean deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

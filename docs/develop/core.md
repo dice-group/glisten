@@ -1,5 +1,32 @@
 This section explains how to change and extend the Core library.
 
+You can either add Glisten as library (you need to add glisten as a maven dependency in this case) or develop on the glisten code directly.
+
+## Add Glisten as a Maven dependency
+
+Add the github repository to your pom.xml
+
+```xml
+<repository>
+    <id>glisten-github</id>
+    <name>Glisten Dice Group repository</name>
+    <url>https://maven.pkg.github.com/dice-group/Glisten</url>
+</repository>
+
+```
+
+Now add the dependency
+
+```xml
+<dependency>
+  <groupId>org.dice_group</groupId>
+  <artifactId>Glisten</artifactId>
+  <version>{{ release_version }}</version>
+</dependency> 
+```
+
+
+
 ## Add your own Scorer
 
 Create your Scorer Algorithm to use inside glisten.

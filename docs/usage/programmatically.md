@@ -9,7 +9,26 @@ It is advised to use Kotlin however.
 
 ## Add Glisten as a Maven dependency
 
-TODO as soon as release is near...
+Add the github repository to your pom.xml
+
+```xml
+<repository>
+    <id>glisten-github</id>
+    <name>Glisten Dice Group repository</name>
+    <url>https://maven.pkg.github.com/dice-group/Glisten</url>
+</repository>
+
+```
+
+Now add the dependency
+
+```xml
+<dependency>
+  <groupId>org.dice_group</groupId>
+  <artifactId>Glisten</artifactId>
+  <version>{{ release_version }}</version>
+</dependency> 
+```
 
 
 ## Execute A benchmark
@@ -132,4 +151,4 @@ val score : Double = scorer.getScore(endpoint, facts)
 
 ## Javadoc/KDoc
 
-You can find the KDoc at ... TODO
+You can find the KDoc/Dokka at [here](dokka)
