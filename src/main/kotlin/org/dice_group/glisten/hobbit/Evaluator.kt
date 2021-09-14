@@ -82,8 +82,8 @@ class Evaluator : AbstractEvaluationModule() {
         if(System.getenv().containsKey(CONSTANTS.SCORER_ALGORITHM)){
             scorer = ScorerFactory.createScorerOrDefault(System.getenv()[CONSTANTS.SCORER_ALGORITHM]!!, conf.namespaces, params.seed, sampleSize)
         }
-        params.linkedPath="/links/"
-        FileUtils.mkdirs("/links/")
+        params.linkedPath="/virtuoso/links/"
+        FileUtils.mkdirs("/virtuoso/links/")
 
         //read config, if config doesn't exist or benchamarkName is not in config will throw an exception
         conf = ConfigurationFactory.findCorrectConfiguration(CONSTANTS.CONFIG_NAME, benchmarkName)
