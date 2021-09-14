@@ -363,18 +363,6 @@
   
 
           
-            
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../develop/overview/" class="md-nav__link">
-        Overview
-      </a>
-    </li>
-  
-
-          
         </ul>
       </nav>
     </li>
@@ -469,6 +457,19 @@
     How to execute a Benchmark
   </a>
   
+    <nav class="md-nav" aria-label="How to execute a Benchmark">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    Parameters
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -476,12 +477,32 @@
     How to add my own System
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-to-add-my-own-benchmark-datasets" class="md-nav__link">
-    How to add my own Benchmark datasets.
+    <nav class="md-nav" aria-label="How to add my own System">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-a-glisten-system-wrapper" class="md-nav__link">
+    create a glisten system wrapper
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-a-repository-add-httpsgitproject-hobbiteu" class="md-nav__link">
+    Create a repository add https://git.project-hobbit.eu/
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#add-you-system-docker-container-to-this-repository" class="md-nav__link">
+    Add you system docker container to this repository
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -526,18 +547,148 @@
                 
                   <h1>Hobbit</h1>
                 
-                <p>TODO as soon as Hobbit implementaion is integrated into Hobbit</p>
-<p>Description</p>
-<p>Image guidance</p>
-<p>what to use/click</p>
+                <p>In this section we explain how to execute a benchmark in Hobbit, what parameters you can use and how to add your own recommendation system to be tested in Hobbit.</p>
 <h2 id="how-to-execute-a-benchmark">How to execute a Benchmark</h2>
+<p>Go to https://main.project-hobbit.eu and login. </p>
+<p>Got to <code>Benchmarks</code> and choose <code>Glisten Benchmark</code>.</p>
+<p>Now choose your System to test, the benchmark you want to execute and all the parameters yo use.</p>
+<h3 id="parameters">Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>benchmarkName</td>
+<td>The benchmark to use inside the configuration file</td>
+</tr>
+<tr>
+<td>seed</td>
+<td>The seed to use for any random acitivity</td>
+</tr>
+<tr>
+<td>minimum property occurrences</td>
+<td>The minimum amount a property has to occur in the dataset to be considered for fact generation</td>
+</tr>
+<tr>
+<td>max property limit</td>
+<td>The max amount a property is retrieved for fact generation, if more facts are available will choose randomly the amount of facts.</td>
+</tr>
+<tr>
+<td>max recommendations</td>
+<td>Only check against the Top N recommendations (For performance reasons)</td>
+</tr>
+<tr>
+<td>Scorer Algorithm</td>
+<td>The Fact Checking algorithm. Currently implemented: [COPAAL, SampleCOPAAL]</td>
+</tr>
+<tr>
+<td>number Of True Statements</td>
+<td>The no. of true facts to generate</td>
+</tr>
+<tr>
+<td>number Of False Statements</td>
+<td>The no. of false facts to generate</td>
+</tr>
+</tbody>
+</table>
 <h2 id="how-to-add-my-own-system">How to add my own System</h2>
-<p>Create a Hobbit Wrapper using the SystemAdapter</p>
-<p>Create a repository in git.project-hobbit.eu</p>
-<p>Add a system.ttl as follows</p>
-<pre><code class="language-ttl">...
+<p>To add your own recommendation system to Hobbits Glisten Benchmark you need to</p>
+<ol>
+<li>create a glisten system wrapper</li>
+<li>Create a repository add https://git.project-hobbit.eu/</li>
+<li>Add you system docker container to this repository</li>
+</ol>
+<h3 id="create-a-glisten-system-wrapper">create a glisten system wrapper</h3>
+<p>For this section we assume you simply use the Glisen repo at https://github.com/dice-group/Glisten and adding your system to the <code>raki-system-adapter</code> module.</p>
+<p>Create a Class (we call this <code>MySystem</code> in the <code>org.dice_group.glisten.hobbit.systems</code> package for now and implement it using Kotlin)</p>
+<pre><code class="language-kotlin">
+package org.dice_group.glisten.hobbit.systems
+
+import org.dice_group.glisten.hobbit.systems.AbstractGlistenHobbitSystem
+import java.io.File
+
+
+/**
+ * Simple test system which just randomly sets scores from 0.0 to 1.0
+ */
+class MySystem : AbstractGlistenHobbitSystem() {
+
+
+    override fun init(){
+        super.init()
+
+        //You can init your system here
+    }
+
+
+    /**
+     * Given a source file and a list of target files, the system shall create a score
+     * for each target file.
+     *
+     * The score represents how fitting the target is for the source file (aka, is it a good recommendation)
+     *
+     * It shall return the mapping File-&gt;Score
+     *
+     * @param source The source to generate the recommendation scores with
+     * @param targets The targets to generate the recommendations scores for
+     * @return The mapping from target file to recommendation score
+     */
+    override fun generateRecommendationScores(source: File, targets: ArrayList&lt;File&gt;): List&lt;Pair&lt;File, Double&gt;&gt; {
+        val ret = mutableListOf&lt;Pair&lt;File, Double&gt;&gt;()
+        targets.forEach{ target -&gt;
+
+            //TODO create your score for this target here
+            val score = 0.0
+
+            ret.add(Pair(target, score))
+        }
+        return ret
+    }
+
+
+}
+
 </code></pre>
-<h2 id="how-to-add-my-own-benchmark-datasets">How to add my own Benchmark datasets.</h2>
+<p>Thats it, implement the TODOs and your system is ready to go.</p>
+<h3 id="create-a-repository-add-httpsgitproject-hobbiteu">Create a repository add https://git.project-hobbit.eu/</h3>
+<p>Go to https://git.project-hobbit.eu/ and create a new project. </p>
+<p>Add a file called <code>system.ttl</code> containing the following</p>
+<pre><code class="language-ttl">@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
+@prefix hobbit: &lt;http://w3id.org/hobbit/vocab#&gt; .
+@prefix glisten: &lt;http://w3id.org/glisten/hobbit/vocab#&gt; .
+
+
+raki:MySystem a  hobbit:SystemInstance;
+    rdfs:label  &quot;MySystem&quot;@en;
+    rdfs:comment    &quot;Description of your system.&quot;@en;
+    hobbit:imageName &quot;git.project-hobbit.eu:4567/YOUR_USERNAME/YOUR_PROJECT_NAME&quot;;
+    hobbit:implementsAPI glisten:Glisten-API .
+
+</code></pre>
+<h3 id="add-you-system-docker-container-to-this-repository">Add you system docker container to this repository</h3>
+<p>Now we need to create a Dockercontainer for the system and push that systme to the hobbit registry.</p>
+<p>Create a <code>Dockerfile</code> in your project</p>
+<pre><code class="language-dockerfile">FROM java
+
+ADD target/glisten-test-1.0.0-SNAPSHOT.jar /glisten/systems.jar
+
+WORKDIR /glisten
+
+CMD java -cp systems.jar org.hobbit.core.run.ComponentStarter org.dice_group.glisten.hobbit.systems.MySystemKt
+</code></pre>
+<p>now build the project</p>
+<pre><code class="language-bash">mvn clean package -P shaded
+</code></pre>
+<p>build and push the container to the hobbit registry.</p>
+<pre><code class="language-bash">docker login git.project-hobbit.eu:4567
+docker build -t git.project-hobbit.eu:4567/YOUR_USERNAME/YOUR_PROJECT_NAME .
+docker push git.project-hobbit.eu:4567/YOUR_USERNAME/YOUR_PROJECT_NAME
+</code></pre>
+<p>Now you should be able to access your system on Hobbit.</p>
                 
               
               

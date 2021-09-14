@@ -363,18 +363,6 @@
   
 
           
-            
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../develop/overview/" class="md-nav__link">
-        Overview
-      </a>
-    </li>
-  
-
-          
         </ul>
       </nav>
     </li>
@@ -546,7 +534,21 @@
 <p>Glisten was programmed in Kotlin and is thus accessible in Java as well. 
 It is advised to use Kotlin however.</p>
 <h2 id="add-glisten-as-a-maven-dependency">Add Glisten as a Maven dependency</h2>
-<p>TODO as soon as release is near...</p>
+<p>Add the github repository to your pom.xml</p>
+<pre><code class="language-xml">&lt;repository&gt;
+    &lt;id&gt;glisten-github&lt;/id&gt;
+    &lt;name&gt;Glisten Dice Group repository&lt;/name&gt;
+    &lt;url&gt;https://maven.pkg.github.com/dice-group/Glisten&lt;/url&gt;
+&lt;/repository&gt;
+
+</code></pre>
+<p>Now add the dependency</p>
+<pre><code class="language-xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.dice_group&lt;/groupId&gt;
+  &lt;artifactId&gt;Glisten&lt;/artifactId&gt;
+  &lt;version&gt;$RELEASE_VERSION&lt;/version&gt;
+&lt;/dependency&gt; 
+</code></pre>
 <h2 id="execute-a-benchmark">Execute A benchmark</h2>
 <p>To execute a benchmark programmatically you need to use the <code>CoreEvaluator</code></p>
 <ol>
@@ -629,7 +631,7 @@ val scorer : Scorer = ScorerFactory.createScorerOrDefault(&quot;Copaal&quot;,con
 val score : Double = scorer.getScore(endpoint, facts)
 </code></pre>
 <h2 id="javadockdoc">Javadoc/KDoc</h2>
-<p>You can find the KDoc at ... TODO</p>
+<p>You can find the KDoc/Dokka at <a href="dokka">here</a></p>
                 
               
               

@@ -65,7 +65,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#add-your-own-scorer" class="md-skip">
+        <a href="#add-glisten-as-a-maven-dependency" class="md-skip">
           Skip to content
         </a>
       
@@ -363,6 +363,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#add-glisten-as-a-maven-dependency" class="md-nav__link">
+    Add Glisten as a Maven dependency
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#add-your-own-scorer" class="md-nav__link">
     Add your own Scorer
   </a>
@@ -450,18 +457,6 @@
     <li class="md-nav__item">
       <a href="../hobbit/" class="md-nav__link">
         Hobbit
-      </a>
-    </li>
-  
-
-          
-            
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../overview/" class="md-nav__link">
-        Overview
       </a>
     </li>
   
@@ -567,6 +562,23 @@
                   <h1>Core</h1>
                 
                 <p>This section explains how to change and extend the Core library.</p>
+<p>You can either add Glisten as library (you need to add glisten as a maven dependency in this case) or develop on the glisten code directly.</p>
+<h2 id="add-glisten-as-a-maven-dependency">Add Glisten as a Maven dependency</h2>
+<p>If you just want to extend Glisten add the github repository to your pom.xml</p>
+<pre><code class="language-xml">&lt;repository&gt;
+    &lt;id&gt;glisten-github&lt;/id&gt;
+    &lt;name&gt;Glisten Dice Group repository&lt;/name&gt;
+    &lt;url&gt;https://maven.pkg.github.com/dice-group/Glisten&lt;/url&gt;
+&lt;/repository&gt;
+
+</code></pre>
+<p>Now add the dependency</p>
+<pre><code class="language-xml">&lt;dependency&gt;
+  &lt;groupId&gt;org.dice_group&lt;/groupId&gt;
+  &lt;artifactId&gt;Glisten&lt;/artifactId&gt;
+  &lt;version&gt;$RELEASE_VERSION&lt;/version&gt;
+&lt;/dependency&gt; 
+</code></pre>
 <h2 id="add-your-own-scorer">Add your own Scorer</h2>
 <p>Create your Scorer Algorithm to use inside glisten.</p>
 <p>You need to </p>

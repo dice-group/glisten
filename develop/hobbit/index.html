@@ -64,6 +64,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#add-your-benchmark" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -360,22 +365,65 @@
       
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Hobbit
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         Hobbit
       </a>
       
-    </li>
-  
-
-          
-            
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
   
-    <li class="md-nav__item">
-      <a href="../overview/" class="md-nav__link">
-        Overview
-      </a>
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#add-your-benchmark" class="md-nav__link">
+    Add your Benchmark
+  </a>
+  
+    <nav class="md-nav" aria-label="Add your Benchmark">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-configuration" class="md-nav__link">
+    Create Configuration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#update-docker-container" class="md-nav__link">
+    Update Docker container
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#change-the-benchmarkttl-file" class="md-nav__link">
+    Change the Benchmark.ttl file
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -479,7 +527,55 @@
                 
                   <h1>Hobbit</h1>
                 
-                <p>TODO explain how to add a benchmark to hobbit.</p>
+                <p>In this section we explain how to add your benchmark to Hobbit.</p>
+<p>Be aware that you need a reachable server where you can store your target, sources and linked dataset.</p>
+<h2 id="add-your-benchmark">Add your Benchmark</h2>
+<p>clone the glisten repo from https://github.com/dice-group/Glisten </p>
+<pre><code>git clone https://github.com/dice-group/Glisten
+</code></pre>
+<h3 id="create-configuration">Create Configuration</h3>
+<p>Now go into <code>raki-hobbit/docker</code> and edit the <code>data_config.yml</code> file and add your system as follows</p>
+<pre><code class="language-yaml">configurations:
+    - name: &quot;MyBenchmark&quot;
+      linksUrlZip: &quot;https://hobbitdata.informatik.uni-leipzig.de/glisten/bp_links.zip&quot;
+      targetUrlZip: &quot;https://hobbitdata.informatik.uni-leipzig.de/glisten/bp_targets.zip&quot;
+      sources:
+        - &quot;https://hobbitdata.informatik.uni-leipzig.de/glisten/birthPlace.nt&quot;
+      trueStmtDrawerOpt:
+        stmtDrawerType: &quot;allowlist&quot;
+        list:
+          - &quot;http://dbpedia.org/ontology/birthPlace&quot;
+      falseStmtDrawerOpt:
+        stmtDrawerType: &quot;allowlist&quot;
+        list:
+          - &quot;http://dbpedia.org/ontology/birthPlace&quot;
+      namespaces:
+        - &quot;http://dbpedia.org/ontology/&quot;
+
+</code></pre>
+<p>Set your benchmark name (e.g MyBenchmark)</p>
+<p>Set the target url zip file containing all target files.</p>
+<p>set the Linked datasets url zip file containing all linked datasets.
+These need to contain a file for each target named <code>SOURCENAME_TARGETNAME.nt</code>  which contains the target dataset and the links between the specified source dataset and the target dataset.</p>
+<p>Add the links to your sources.</p>
+<p>And for the fact checking add the <code>trueStmtDrawerOpt</code> which desribes how to retrieve positive facts, as well as the <code>falseStmtDrawerOpt</code>. 
+Set the <code>stmtDrawerType</code> to either <code>allowlist</code> or <code>blocklist</code> depending on how you want to generate the facts and
+add a <code>list</code> parameter which describes the <code>allowlist</code> (resp <code>blocklist</code>)</p>
+<p>Finally add namespaces you want to use (mainly for performance usage)</p>
+<h3 id="update-docker-container">Update Docker container</h3>
+<p>now you nede to update the docker container by simply executing</p>
+<pre><code class="language-bash">./build_docker.sh 
+</code></pre>
+<h3 id="change-the-benchmarkttl-file">Change the Benchmark.ttl file</h3>
+<p>Now go to https://git.project-hobbit.eu/glisten/benchmark/ and edit the <code>benchmark.ttl</code> file and add</p>
+<pre><code class="language-ttl">glisten:MyBenchmark a glisten:Datasets;
+        rdfs:label &quot;MyBenchmark&quot;@en;
+        rdfs:comment &quot;MyBenchmark Description&quot;@en .
+
+</code></pre>
+<p>Be aware that the rdfs:label needs to be the same as the name in the configurations.</p>
+<p>Now you should be able to use your benchmark in Hobbit. </p>
+<p>Make sure that the corresponding links in the configuration are accessable.</p>
                 
               
               
@@ -520,13 +616,13 @@
       
       
         
-        <a href="../overview/" class="md-footer__link md-footer__link--next" aria-label="Next: Overview" rel="next">
+        <a href="../../usage/configuration/" class="md-footer__link md-footer__link--next" aria-label="Next: Configuration" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Overview
+              Configuration
             </div>
           </div>
           <div class="md-footer__button md-icon">
