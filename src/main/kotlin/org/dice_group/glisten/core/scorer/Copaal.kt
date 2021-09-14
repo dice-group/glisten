@@ -8,7 +8,6 @@ import org.apache.jena.rdf.model.Statement
 import org.dice_research.fc.IFactChecker
 import org.dice_research.fc.paths.PathBasedFactChecker
 import org.dice_research.fc.paths.PredicateFactory
-import org.dice_research.fc.paths.scorer.ICountRetriever
 import org.dice_research.fc.paths.scorer.NPMIBasedScorer
 import org.dice_research.fc.paths.scorer.count.PropPathBasedPairCountRetriever
 import org.dice_research.fc.paths.scorer.count.decorate.CachingCountRetrieverDecorator
@@ -27,8 +26,9 @@ import java.util.concurrent.TimeUnit
  * For more details on how Copaal works, have a look at [https://github.com/dice-group/COPAAL/](https://github.com/dice-group/COPAAL/)
  *
  * @param namespaces The namespaces to consider while fact checking.
+ * @param scoreMethod  The score method to use. [AUC, RootMeanSqrt, AverageScore]. Default is AUC.
  */
-open class Copaal(namespaces: List<String>) : Scorer(namespaces){
+open class Copaal(namespaces: List<String>, scoreMethod : String = "AUC") : Scorer(namespaces, scoreMethod){
 
     /**
      * Creates a COPAAL [PathBasedFactChecker] using an [QueryExecutionFactoryHttp] with a delay of 200ms and a timeout of 30s

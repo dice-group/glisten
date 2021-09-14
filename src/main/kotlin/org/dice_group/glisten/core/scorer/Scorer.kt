@@ -3,6 +3,7 @@ package org.dice_group.glisten.core.scorer
 import org.apache.jena.rdf.model.Statement
 import org.dice_group.glisten.core.evaluation.ROCCurve
 import java.util.*
+import kotlin.math.sqrt
 
 /**
  * ## Description
@@ -14,10 +15,11 @@ import java.util.*
  * To create a Scorer use the [ScorerFactory].
  *
  * @param namespaces The namespaces to use/consider creating the score.
+ * @param scoreMethod The score method to use. [AUC, RootMeanSqrt, AverageScore]. Default is AUC.
  *
  * @see ScorerFactory
  */
-abstract class Scorer(val namespaces: List<String>) {
+abstract class Scorer(val namespaces: List<String>, val scoreMethod: String = "AUC") {
 
     var threshold = 0.0
 
@@ -47,8 +49,13 @@ abstract class Scorer(val namespaces: List<String>) {
                 it.second
             }
         }
-
-        return getAUC(scores)
+        //choose one method and return the method
+        return when(scoreMethod.lowercase(Locale.getDefault())){
+            "rootmeansqrt" -> getSqrtMeanScore(scores)
+            "auc" -> getAUC(scores)
+            "averagescore" -> getAverageScore(scores)
+            else -> getAUC(scores)
+        }
     }
 
     /**
@@ -85,7 +92,42 @@ abstract class Scorer(val namespaces: List<String>) {
             }
         }
         return roc.calculateAUC()
+    }
 
+    /**
+     * Gets the average normalized score
+     *
+     * @param scores the scores containing pairs of th trueness value and the fact scorer value
+     * @return the average normalized score
+     */
+    fun getAverageScore(scores: List<Pair<Double, Double>>) : Double {
+        var score = 0.0
+        scores.forEach { (trueness, scorerScore) ->
+            var normalizedScore = scorerScore.coerceAtLeast(0.0)
+            if(trueness == -1.0){
+                normalizedScore = 1-scorerScore
+            }
+            score += normalizedScore
+        }
+        return score/scores.size
+    }
+
+    /**
+     * Gets the root mean sqrt of the scores
+     *
+     * @param scores the scores containing pairs of th trueness value and the fact scorer value
+     * @return the root mean sqrt error
+     */
+    fun getSqrtMeanScore(scores: List<Pair<Double, Double>>) : Double {
+        var score = 0.0
+        scores.forEach { (trueness, scorerScore) ->
+            var normalizedScore = scorerScore.coerceAtLeast(0.0)
+            if(trueness == -1.0){
+                normalizedScore = 1-scorerScore
+            }
+            score += normalizedScore*normalizedScore
+        }
+        return sqrt(score/scores.size)
     }
 }
 
@@ -122,7 +164,12 @@ object ScorerFactory{
      *
      * Current Implemented Algorithms:
      *
-     * - [Copaal]
+     * - Copaal : Using Copaal with ROC/AUC
+     * - SampleCopaal : Using SampleCopaal with ROC/AUC
+     * - Copaal_RootMeanSquare : Using Copaal with the Root Mean Square error metric
+     * - SampleCopaal_RootMeanSquare : Using SampleCopaal with the Root Mean Square error metric
+     * - Copaal_AvgScore : Using Copaal with the Average Score metric
+     * - SampleCopaal_AvgScore : Using SampleCopaal with the Average Score metric
      *
      * @param scorerAlgorithm The name of the scorer algorithm e.g COPAAL
      * @param namespaces The list of namespaces which should be used
@@ -135,6 +182,10 @@ object ScorerFactory{
         when(scorerAlgorithm.lowercase(Locale.getDefault())){
             "copaal" -> scorer = Copaal(namespaces)
             "samplecopaal" -> {println("[+] Using SampleCopaal"); scorer = SampleCopaal(seed, sampleSize, namespaces)}
+            "copaal_rootmeansquare" -> scorer = Copaal(namespaces, "RootMeanSquare")
+            "samplecopaal_rootmeansquare" -> {println("[+] Using SampleCopaal[RootMeanSquare]"); scorer = SampleCopaal(seed, sampleSize, namespaces,"RootMeanSquare")}
+            "copaal_avgscore" -> scorer = Copaal(namespaces, "AverageScore")
+            "samplecopaal_avgscore" -> {println("[+] Using SampleCopaal[AvgScore]"); scorer = SampleCopaal(seed, sampleSize, namespaces,"AverageScore")}
         }
         return scorer
     }

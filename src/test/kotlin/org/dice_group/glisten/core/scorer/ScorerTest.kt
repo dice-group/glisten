@@ -10,7 +10,7 @@ import kotlin.test.assertEquals
 class ScorerTest {
 
     @ParameterizedTest(name = "given the order \"{0}\" calculate the correct score \"{1}\"")
-    @MethodSource("rawScores")
+    @MethodSource("rawAUCScores")
     fun `given an order of scores, calculate the correct auc`(
         scores : List<Pair<Double, Double>>,
         expectedScore : Double
@@ -21,7 +21,7 @@ class ScorerTest {
 
     companion object {
         @JvmStatic
-        fun rawScores(): Stream<Arguments> = Stream.of(
+        fun rawAUCScores(): Stream<Arguments> = Stream.of(
             Arguments.of(listOf(Pair(1.0, 1.0), Pair(1.0, 0.8), Pair(1.0, 0.0), Pair(-1.0, -0.5), Pair(-1.0, -0.8)), 1.0),
             Arguments.of(listOf(Pair(-1.0, 1.0), Pair(-1.0, 0.8), Pair(-1.0, 0.0), Pair(1.0, -0.5), Pair(1.0, -0.8)), 0.0),
             Arguments.of(listOf(Pair(1.0, 1.0), Pair(-1.0, 0.8), Pair(1.0, 0.0), Pair(-1.0, -0.5)), 0.75)

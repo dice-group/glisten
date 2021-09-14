@@ -4,7 +4,7 @@ You can either add Glisten as library (you need to add glisten as a maven depend
 
 ## Add Glisten as a Maven dependency
 
-Add the github repository to your pom.xml
+If you just want to extend Glisten add the github repository to your pom.xml
 
 ```xml
 <repository>

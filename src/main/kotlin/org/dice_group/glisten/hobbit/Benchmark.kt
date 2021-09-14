@@ -18,6 +18,8 @@ package org.dice_group.glisten.hobbit
 
 import org.apache.jena.rdf.model.NodeIterator
 import org.apache.jena.rdf.model.Resource
+import org.apache.jena.rdf.model.ResourceFactory
+import org.apache.jena.vocabulary.RDFS
 import org.dice_group.glisten.core.config.CONSTANTS
 import org.hobbit.core.Constants
 import org.hobbit.core.components.AbstractBenchmarkController
@@ -30,11 +32,11 @@ class Benchmark : AbstractBenchmarkController() {
     companion object {
 
         private const val EVALUATION_MODULE_CONTAINER_IMAGE =
-            "git.project-hobbit.eu:4567/glisten/glisten-benchmark/glisten-evaluationmodule"
+            "git.project-hobbit.eu:4567/glisten/benchmark/evaluationmodule"
         private const val TASK_GENERATOR_CONTAINER_IMAGE =
-            "git.project-hobbit.eu:4567/glisten/glisten-benchmark/glisten-taskgenerator"
+            "git.project-hobbit.eu:4567/glisten/benchmark/taskgenerator"
         private const val DATA_GENERATOR_CONTAINER_IMAGE =
-            "git.project-hobbit.eu:4567/glisten/glisten-benchmark/glisten-datagenerator"
+            "git.project-hobbit.eu:4567/glisten/benchmark/datagenerator"
 
         private val LOGGER = LoggerFactory.getLogger(this::class.java.name)
     }
@@ -49,7 +51,7 @@ class Benchmark : AbstractBenchmarkController() {
             .listObjectsOfProperty(benchmarkParamModel.getProperty(CONSTANTS.GLISTEN_PREFIX + "benchmarkName"))
         var datasetName = ""
         if (iterator.hasNext()) {
-            datasetName = iterator.next().asResource().toString()
+            datasetName = benchmarkParamModel.listObjectsOfProperty(ResourceFactory.createResource(iterator.next().asResource().toString()), RDFS.label).next().asLiteral().value.toString()
         }
 
 
@@ -90,13 +92,27 @@ class Benchmark : AbstractBenchmarkController() {
             noOfFalseStatements = iterator.next().asLiteral().int
         }
 
+        iterator = benchmarkParamModel
+            .listObjectsOfProperty(benchmarkParamModel.getProperty(CONSTANTS.GLISTEN_PREFIX + "maxRecommendations"))
+        var maxRecommendations = 10
+        if (iterator.hasNext()) {
+            maxRecommendations = iterator.next().asLiteral().int
+        }
 
         iterator = benchmarkParamModel
-            .listObjectsOfProperty(benchmarkParamModel.getProperty(CONSTANTS.GLISTEN_PREFIX + "noOfStatements"))
-        var noOfStatements = 1
+            .listObjectsOfProperty(benchmarkParamModel.getProperty(CONSTANTS.GLISTEN_PREFIX + "sampleSize"))
+        var sampleSize = 1000
         if (iterator.hasNext()) {
-            noOfStatements = iterator.next().asLiteral().int
+            sampleSize = iterator.next().asLiteral().int
         }
+
+        iterator = benchmarkParamModel
+            .listObjectsOfProperty(benchmarkParamModel.getProperty(CONSTANTS.GLISTEN_PREFIX + "scorerAlgorithm"))
+        var scorerAlgorithm = "SampleCopaal"
+        if (iterator.hasNext()) {
+            scorerAlgorithm = benchmarkParamModel.listObjectsOfProperty(ResourceFactory.createResource(iterator.next().asResource().toString()), RDFS.label).next().asLiteral().value.toString()
+        }
+
 
         // create TG Module
         createTaskGenerators(
@@ -118,11 +134,13 @@ class Benchmark : AbstractBenchmarkController() {
                 Constants.ACKNOWLEDGEMENT_FLAG_KEY + "=true",
                 DEFAULT_EVAL_STORAGE_PARAMETERS[0],
                 CONSTANTS.SEED + "=" + seed,
-                CONSTANTS.NUMBER_OF_STATEMENTS + "=" + noOfStatements,
+                CONSTANTS.MAX_RECOMMENDATIONS + "=" + maxRecommendations,
                 CONSTANTS.NUMBER_OF_TRUE_STATEMENTS + "=" + noOfTrueStatements,
                 CONSTANTS.NUMBER_OF_FALSE_STATEMENTS + "=" + noOfFalseStatements,
                 CONSTANTS.MIN_PROP_OCC + "=" + minPropOcc ,
                 CONSTANTS.MAX_PROPERTY_LIMIT + "=" + maxPropertyLimit,
+                CONSTANTS.SAMPLE_SIZE + "=" + sampleSize,
+                CONSTANTS.SCORER_ALGORITHM + "=" +scorerAlgorithm
             )
         )
 

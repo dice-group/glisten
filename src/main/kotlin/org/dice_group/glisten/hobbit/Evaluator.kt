@@ -27,6 +27,7 @@ import org.dice_group.glisten.core.config.ConfigurationFactory
 import org.dice_group.glisten.core.config.EvaluationParameters
 import org.dice_group.glisten.core.evaluation.CoreEvaluator
 import org.dice_group.glisten.core.scorer.Copaal
+import org.dice_group.glisten.core.scorer.SampleCopaal
 import org.dice_group.glisten.core.scorer.Scorer
 import org.dice_group.glisten.core.scorer.ScorerFactory
 import org.hobbit.core.components.AbstractEvaluationModule
@@ -70,14 +71,14 @@ class Evaluator : AbstractEvaluationModule() {
         if(System.getenv().containsKey(CONSTANTS.MAX_RECOMMENDATIONS)){
             params.maxRecommendations = System.getenv()[CONSTANTS.MAX_RECOMMENDATIONS]!!.toInt()
         }
-        var sampleSize = 30
+        var sampleSize = 1000
         if(System.getenv().containsKey(CONSTANTS.SAMPLE_SIZE)){
             sampleSize = System.getenv()[CONSTANTS.SAMPLE_SIZE]!!.toInt()
         }
         if(System.getenv().containsKey(CONSTANTS.SEED)){
             params.seed = System.getenv()[CONSTANTS.SEED]!!.toLong()
         }
-        var scorer : Scorer = Copaal(conf.namespaces)
+        var scorer : Scorer = SampleCopaal(params.seed, sampleSize, conf.namespaces)
         if(System.getenv().containsKey(CONSTANTS.SCORER_ALGORITHM)){
             scorer = ScorerFactory.createScorerOrDefault(System.getenv()[CONSTANTS.SCORER_ALGORITHM]!!, conf.namespaces, params.seed, sampleSize)
         }
@@ -151,7 +152,7 @@ class Evaluator : AbstractEvaluationModule() {
 
         val LOGGER: Logger = LoggerFactory.getLogger(Evaluator::class.java)
         val avgAUC: Property? = ResourceFactory.createProperty(CONSTANTS.GLISTEN_PREFIX+"avgAUC")
-        val sumTime: Property?= ResourceFactory.createProperty(CONSTANTS.GLISTEN_PREFIX+"SumTime")
+        val sumTime: Property?= ResourceFactory.createProperty(CONSTANTS.GLISTEN_PREFIX+"sumTime")
         val maxTime: Property?= ResourceFactory.createProperty(CONSTANTS.GLISTEN_PREFIX+"maxTime")
         val minTime: Property?= ResourceFactory.createProperty(CONSTANTS.GLISTEN_PREFIX+"minTime")
         val avgTime: Property?= ResourceFactory.createProperty(CONSTANTS.GLISTEN_PREFIX+"avgTime")

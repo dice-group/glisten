@@ -61,19 +61,19 @@ class Test : Callable<Int> {
     var numberOfFalseStatements = 5;
 
 
-    @CommandLine.Option(names = ["--sample-size"], description = ["the sample size to use if Scorer uses samples. Default=30"])
-    var sampleSize = 30
+    @CommandLine.Option(names = ["--sample-size"], description = ["the sample size to use if Scorer uses samples. Default=1000"])
+    var sampleSize = 1000
 
     @CommandLine.Parameters(description = ["the rdf endpoint to use"])
     lateinit var rdfEndpoint : String
 
-    @CommandLine.Option(names = ["-c", "--config"], description = ["the config file for glisten. Default: data_config.yml"])
-    var configFile = "data_config.yml"
+    @CommandLine.Option(names = ["-c", "--config"], description = ["the config file for glisten. Default: data_config.yaml"])
+    var configFile = "data_config.yaml"
 
     @CommandLine.Option(names = ["-o", "--order-file"], description = ["A file containing the order of the recommendations, if not set, will be random"])
     var orderFile = ""
 
-    @CommandLine.Option(names = ["-s", "--scorer"], description = ["The Scorer algorithm to use. Algorithms: [Copaal, SampleCopaal] "])
+    @CommandLine.Option(names = ["-s", "--scorer"], description = ["The Scorer algorithm to use. Algorithms: [Copaal, SampleCopaal, Copaal_RootMeanSquare, SampleCopaal_RootMeanSquare, Copaal_AvgScore, SampleCopaal_AvgScore] "])
     var scorerAlgorithm = "Copaal"
 
     @CommandLine.Option(names = ["-N", "--benchmark-name"], description = ["The name of the benchmark to use. Name is specified inside the given configuration file."])
