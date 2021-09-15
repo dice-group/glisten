@@ -45,7 +45,7 @@ class SampleCopaal(private val seed : Long, private val sampleSize: Int, namespa
             ),
             NPMIBasedScorer(
                 CachingCountRetrieverDecorator(
-                    SamplingCountRetrieverDecorator(
+                    CachingSamplingCountRetrieverDecorator(
                         PropPathBasedPairCountRetriever(qef, DefaultMaxCounter(qef)),
                         seed,
                         sampleSize,

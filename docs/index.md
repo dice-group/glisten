@@ -113,8 +113,7 @@ upload datasets to the triplestore.
                       A file containing the order of the recommendations, if
                         not set, will be random
   -s, --scorer=<scorerAlgorithm>
-                      The Scorer algorithm to use. Algorithms: [Copaal,
-                        SampleCopaal]
+                      The Scorer algorithm to use. Algorithms: [Copaal, SampleCopaal, Copaal_RootMeanSquare, SampleCopaal_RootMeanSquare, Copaal_AvgScore, SampleCopaal_AvgScore]
   -S, --seed=<seed>   the seed to use for anything random we do. Default is
                         random
       --sample-size=<sampleSize>
@@ -135,16 +134,30 @@ Have a look at [Configuration](usage/configuration) for further information.
 ## How do you calculate the Scorer scores?
 
 
-The Scorer scores are calculatet using a ROC curve as well. The score is again the corresponding AUC value. The actual creation of the ROC curve is dependent of the scorer system.
+There are three different ways to calculate the score to use in the ROC cuve.
 
-### Using Copaal:
+All three ways are implement for both systems, Copaal as well as SampleCopaal
+
 
 For each fact copaal checks the veracity score. A score that basically means how "true" the fact seems. We generate some true and some false facts from the source model for this.
+
+
+### Using ROC/AUC (default):
+
 
 We then sort the facts after their veracity scores and for each score we then check if the fact is a true fact or a false fact. If the fact is a true fact the ROC curve goes up, if it is a false fact the ROC curve goes right.
 
 Hence if an added target dataset provides some value for a true fact, the true fact should be seen as truer than before by Copaal. Thus it ideally goes up in the ranking, and the ROC curve is going up earlier, providing a better AUC score.
 
+
+### Using Average Score (AvgScore)
+
+We simply take the average of the veracity scores for each. 
+Hence if an added target dataset provides some value for a true fact, the veracity score gets better and the average score as well. 
+
+### Using Root Square Mean Error
+
+The same way the average score is calcualted except we calculate the Root Square Mean.
 
 ## Where is the code?
 

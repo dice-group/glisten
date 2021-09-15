@@ -81,8 +81,7 @@ upload datasets to the triplestore.
                       A file containing the order of the recommendations, if
                         not set, will be random
   -s, --scorer=<scorerAlgorithm>
-                      The Scorer algorithm to use. Algorithms: [Copaal,
-                        SampleCopaal]
+                      The Scorer algorithm to use. Algorithms: [Copaal, SampleCopaal, Copaal_RootMeanSquare, SampleCopaal_RootMeanSquare, Copaal_AvgScore, SampleCopaal_AvgScore]
   -S, --seed=<seed>   the seed to use for anything random we do. Default is
                         random
       --sample-size=<sampleSize>
