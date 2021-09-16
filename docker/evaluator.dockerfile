@@ -1,11 +1,11 @@
-FROM java
+FROM openjdk:11
 
 WORKDIR /glisten
 
 ADD setupfuseki.sh .
 RUN ./setupfuseki.sh
 
-ADD docker/data_config.yml database/
+ADD docker/data_config.yaml database/
 ADD load_triplestore.sh .
 
 ADD target/glisten-test-1.0.0-SNAPSHOT.jar /glisten/controller.jar
