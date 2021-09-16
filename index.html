@@ -378,8 +378,22 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#using-copaal" class="md-nav__link">
-    Using Copaal:
+  <a href="#using-rocauc-default" class="md-nav__link">
+    Using ROC/AUC (default):
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-average-score-avgscore" class="md-nav__link">
+    Using Average Score (AvgScore)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-root-square-mean-error" class="md-nav__link">
+    Using Root Square Mean Error
   </a>
   
 </li>
@@ -646,8 +660,7 @@ upload datasets to the triplestore.
                       A file containing the order of the recommendations, if
                         not set, will be random
   -s, --scorer=&lt;scorerAlgorithm&gt;
-                      The Scorer algorithm to use. Algorithms: [Copaal,
-                        SampleCopaal]
+                      The Scorer algorithm to use. Algorithms: [Copaal, SampleCopaal, Copaal_RootMeanSquare, SampleCopaal_RootMeanSquare, Copaal_AvgScore, SampleCopaal_AvgScore]
   -S, --seed=&lt;seed&gt;   the seed to use for anything random we do. Default is
                         random
       --sample-size=&lt;sampleSize&gt;
@@ -661,11 +674,17 @@ upload datasets to the triplestore.
 </code></pre>
 <p>Have a look at <a href="usage/configuration">Configuration</a> for further information.</p>
 <h2 id="how-do-you-calculate-the-scorer-scores">How do you calculate the Scorer scores?</h2>
-<p>The Scorer scores are calculatet using a ROC curve as well. The score is again the corresponding AUC value. The actual creation of the ROC curve is dependent of the scorer system.</p>
-<h3 id="using-copaal">Using Copaal:</h3>
+<p>There are three different ways to calculate the score to use in the ROC cuve.</p>
+<p>All three ways are implement for both systems, Copaal as well as SampleCopaal</p>
 <p>For each fact copaal checks the veracity score. A score that basically means how "true" the fact seems. We generate some true and some false facts from the source model for this.</p>
+<h3 id="using-rocauc-default">Using ROC/AUC (default):</h3>
 <p>We then sort the facts after their veracity scores and for each score we then check if the fact is a true fact or a false fact. If the fact is a true fact the ROC curve goes up, if it is a false fact the ROC curve goes right.</p>
 <p>Hence if an added target dataset provides some value for a true fact, the true fact should be seen as truer than before by Copaal. Thus it ideally goes up in the ranking, and the ROC curve is going up earlier, providing a better AUC score.</p>
+<h3 id="using-average-score-avgscore">Using Average Score (AvgScore)</h3>
+<p>We simply take the average of the veracity scores for each. 
+Hence if an added target dataset provides some value for a true fact, the veracity score gets better and the average score as well. </p>
+<h3 id="using-root-square-mean-error">Using Root Square Mean Error</h3>
+<p>The same way the average score is calcualted except we calculate the Root Square Mean.</p>
 <h2 id="where-is-the-code">Where is the code?</h2>
 <p>The code is open source at <a href="https://github.com/dice-group/Glisten">https://github.com/dice-group/Glisten</a> and you can code with us if you want to :)</p>
 <h2 id="where-do-i-submit-a-bug-or-enhancement">Where do I submit a bug or enhancement?</h2>
