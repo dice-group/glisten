@@ -1,7 +1,7 @@
 FROM java
 
-RUN sudo apt-get update && sudo apt-get upgrade
-RUN sudo apt-get install wget tar
+#RUN apt-get update && apt-get upgrade
+RUN apt-get install wget tar
 
 WORKDIR /virtuoso
 
@@ -14,7 +14,7 @@ RUN cd /virtuoso/virtuoso-opensource/bin && ./virtuoso-t +configfile /virtuoso/c
 
 WORKDIR /glisten
 
-ADD docker/data_config.yml .
+ADD docker/data_config.yaml .
 ADD load_triplestore.sh .
 
 ADD target/glisten-test-1.0.0-SNAPSHOT.jar /glisten/controller.jar
