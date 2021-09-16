@@ -1,4 +1,4 @@
-#mvn clean package -P shaded
+mvn clean package -P shaded
 
 sudo docker build -f docker/controller.dockerfile -t  git.project-hobbit.eu:4567/glisten/benchmark/controller .
 sudo docker build -f docker/dataGenerator.dockerfile -t  git.project-hobbit.eu:4567/glisten/benchmark/datagenerator .

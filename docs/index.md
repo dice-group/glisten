@@ -155,9 +155,9 @@ Hence if an added target dataset provides some value for a true fact, the true f
 We simply take the average of the veracity scores for each. 
 Hence if an added target dataset provides some value for a true fact, the veracity score gets better and the average score as well. 
 
-### Using Root Square Mean Error
+### Using Root Mean Square Error
 
-The same way the average score is calcualted except we calculate the Root Square Mean.
+The same way the average score is calcualted except we calculate the Root Mean Square Error.
 
 ## Where is the code?
 
