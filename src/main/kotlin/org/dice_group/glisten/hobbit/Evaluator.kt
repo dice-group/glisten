@@ -82,13 +82,13 @@ class Evaluator : AbstractEvaluationModule() {
         if(System.getenv().containsKey(CONSTANTS.SCORER_ALGORITHM)){
             scorer = ScorerFactory.createScorerOrDefault(System.getenv()[CONSTANTS.SCORER_ALGORITHM]!!, conf.namespaces, params.seed, sampleSize)
         }
-        params.linkedPath="/virtuoso/links/"
-        FileUtils.mkdirs("/virtuoso/links/")
+        params.linkedPath="/glisten/links/"
+        FileUtils.mkdirs("/glisten/links/")
 
         //read config, if config doesn't exist or benchamarkName is not in config will throw an exception
         conf = ConfigurationFactory.findCorrectConfiguration(CONSTANTS.CONFIG_NAME, benchmarkName)
         // create core evaluator using a standard virtuoso endpoint for now.
-        coreEvaluator = CoreEvaluator(conf, params,"http://localhost:8890/sparql", scorer)
+        coreEvaluator = CoreEvaluator(conf, params,"http://localhost:3030/ds/sparql", scorer)
 
         //download zips and extract them
         coreEvaluator.init("/")

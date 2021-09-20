@@ -2,6 +2,9 @@ FROM openjdk:11
 
 WORKDIR /glisten
 
+ADD hdt.zip 
+RUN unzip hdt.zip
+
 ADD setupfuseki.sh .
 RUN ./setupfuseki.sh
 

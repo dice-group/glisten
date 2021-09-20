@@ -2,7 +2,10 @@ package org.dice_group.glisten.core.evaluation
 
 import net.lingala.zip4j.ZipFile
 import net.lingala.zip4j.exception.ZipException
+import org.apache.jena.rdf.model.ResourceFactory
 import org.apache.jena.rdf.model.Statement
+import org.apache.jena.riot.Lang
+import org.apache.jena.riot.RDFDataMgr
 import org.dice_group.glisten.core.config.Configuration
 import org.dice_group.glisten.core.config.EvaluationParameters
 import org.dice_group.glisten.core.scorer.Copaal
@@ -11,6 +14,7 @@ import org.dice_group.glisten.core.scorer.Scorer
 import org.dice_group.glisten.core.utils.DownloadUtils
 import org.dice_group.glisten.core.utils.RDFUtils
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 
 /**
@@ -146,9 +150,6 @@ class CoreEvaluator(private val conf: Configuration, val params: EvaluationParam
      * @return the normalized AUC score
      */
     fun getAUC(source: String, recommendations: MutableList<Pair<String, Double>>) : Double {
-        print("[-] loading source into triplestore now")
-        RDFUtils.loadTripleStoreFromScript(source, params.triplestoreLoaderScript)
-        println("\r[+] finished loading source into triplestore.")
 
         //create source model and
         // download file from URL stream. (is in file:/// format if locally)
@@ -162,7 +163,19 @@ class CoreEvaluator(private val conf: Configuration, val params: EvaluationParam
             conf.createFalseStmtDrawer(params.seed, sourceModel, params.minPropertyOccurrences, params.maxPropertyLimit)
         )
         //we can now delete the sourceModel from memory
+        facts.forEach {
+            if(it.second==1.0) {
+                sourceModel.remove(it.first)
+            }
+        }
+        val cleanedSource = "tmp_source.nt"
+        RDFDataMgr.write(FileOutputStream(cleanedSource), sourceModel, Lang.NT)
         sourceModel.removeAll()
+
+        print("[-] loading source into triplestore now")
+        RDFUtils.loadTripleStoreFromScript(cleanedSource, params.triplestoreLoaderScript)
+        println("\r[+] finished loading source into triplestore.")
+
         //create baseline (w/o recommendations)
         val baseline = getScore(facts, source, "")
 
@@ -173,6 +186,7 @@ class CoreEvaluator(private val conf: Configuration, val params: EvaluationParam
         //return normalizer*(roc.calculateAUC()-baseline)
 
         val roc = getBetterROC(baseline, source, facts, recommendations)
+        println("[+] ROC Curve created: $roc")
         return roc.calculateAUC()
     }
 

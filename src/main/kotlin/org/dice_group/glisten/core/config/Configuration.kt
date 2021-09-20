@@ -1,5 +1,6 @@
 package org.dice_group.glisten.core.config
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.dice_group.glisten.core.scorer.Scorer
 import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonParseException
@@ -81,7 +82,8 @@ class Configuration{
     lateinit var linksUrlZip: String
     lateinit var trueStmtDrawerOpt: Map<String, Any>
     lateinit var falseStmtDrawerOpt: Map<String, Any>
-    lateinit var namespaces: List<String>
+
+    var namespaces: List<String> = emptyList()
 
     private fun createStmtDrawer(type: String, list: Collection<String>, seed: Long, model: Model, minPropOcc: Int, maxPropertyLimit: Int  ): StmtDrawer {
         //Add your new statement drawer type here to the `when` clause

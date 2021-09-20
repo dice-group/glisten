@@ -1,15 +1,26 @@
 #!/bin/bash
 
-#we need java 11 set if not set.
-#export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
-export JVM_ARGS=-Xmx60g
 pkill -f fuseki
+mv /glisten/main.hdt _main.hdt
+rm /glisten/main.hdt.*
 
-echo "LOAD <file://$1$2>" > ./update123.query
-./apache-jena-4.2.0/bin/tdbupdate --loc=./TESTDB --update=./update123.query
-rm ./update123.query
+export JVM_ARGS=-Xmx90g
 
-./apache-jena-fuseki-4.2.0/fuseki-server -q --loc=./TESTDB/ /ds > /dev/null &
+rm /glisten/second.hdt
+rm /glisten/second.hdt.*
 
-#Wait for fuseki to be ready
-bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:3030)" != "200" ]]; do sleep 5; done'
+if test -f "$1$2.hdt"; then
+        echo "HDT file exists already. won't reload it"
+        cd /glisten/hdt-java/hdt-java-cli/ && ./bin/hdtCat.sh -index $1$2.hdt /glisten/_main.hdt /glisten/main.hdt
+else
+        echo "Will create HDT files now."
+        cd /glisten/hdt-java/hdt-java-cli/ && ./bin/rdf2hdt.sh $1$2 /glisten/second.hdt
+        cd /glisten/hdt-java/hdt-java-cli/ && ./bin/hdtCat.sh -index  /glisten/second.hdt /glisten/_main.hdt /glisten/main.hdt
+fi
+
+export SERVER_MEM=90g
+cd /glisten/hdt-java/hdt-fuseki/ && ./bin/hdtEndpoint.sh -q --timeout=60000 --hdt /glisten/main.hdt /ds > /dev/null &
+cd /glisten/
+bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://localhost:3030/ds/sparql?query=SELECT+%3Fs+%7B%3Fs+%3Fp+%3Fo%7D+LIMIT+1)" != "200" ]]; do sleep 5; done'
+curl http://localhost:3030/ds/sparql?query=SELECT+%28COUNT%28%2A%29+AS+%3Fco+%29+%7B%3Fs+%3Fp+%3Fo%7D
+

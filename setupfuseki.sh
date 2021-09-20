@@ -1,13 +1,10 @@
-wget https://dlcdn.apache.org/jena/binaries/apache-jena-4.2.0.tar.gz
-tar -xzvf apache-jena-4.2.0.tar.gz 
-rm apache-jena-4.2.0.tar.gz
+#wget https://hobbitdata.aksw.uni-leipzig.de/glisten/hdt.zip 
+#unzip hdt.zip
 
-wget https://dlcdn.apache.org/jena/binaries/apache-jena-fuseki-4.2.0.tar.gz
-tar -xzvf apache-jena-fuseki-4.2.0.tar.gz 
-rm apache-jena-fuseki-4.2.0.tar.gz
+cd /glisten/hdt-java/ && mvn install && cd ..
+cd /glisten/hdt-java/hdt-fuseki/ && mvn package dependency:copy-dependencies
 
-
-#rm ./empty.nt
-touch ./empty.nt
-rm -rf ./TESTDB/
-./apache-jena-4.2.0/bin/tdbloader --loc=./TESTDB/ ./empty.nt
+rm /glisten/empty.nt
+touch /glisten/empty.nt
+cd /glisten/hdt-java/hdt-java-cli/ && ./bin/rdf2hdt.sh /glisten/empty.nt /glisten/second.hdt
+cd /glisten/hdt-java/hdt-java-cli/ && ./bin/rdf2hdt.sh /glisten/empty.nt /glisten/main.hdt

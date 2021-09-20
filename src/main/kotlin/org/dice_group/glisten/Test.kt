@@ -6,6 +6,10 @@ import org.apache.jena.query.ARQ
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.Statement
 import org.apache.jena.riot.RIOT
+import org.apache.jena.riot.Lang
+import org.apache.jena.riot.RDFDataMgr
+import java.io.FileOutputStream
+
 import org.dice_group.glisten.core.ConfigurationLoadException
 import org.dice_group.glisten.core.config.CONSTANTS
 import org.dice_group.glisten.core.config.Configuration
@@ -120,16 +124,29 @@ class Test : Callable<Int> {
         val evaluator = createEvaluator(conf)
         //evaluator.init("/tmp/")
         val sourceFile = conf.sources[0]
-        RDFUtils.loadTripleStoreFromScript(sourceFile, evaluator.params.triplestoreLoaderScript)
 
         //create source model for fact generation
         println("[+] reading source Model now")
         val sourceModel = RDFUtils.streamNoLiterals(sourceFile)
         //create facts for source model
         val facts = createFacts(conf, evaluator, sourceModel)
+        facts.forEach {
+            if(it.second==1.0) {
+                sourceModel.remove(it.first)
+            }
+        }
+        val cleanedSource = "tmp_source.nt"
+        RDFDataMgr.write(FileOutputStream(cleanedSource), sourceModel, Lang.NT)
+
+        //Save memory remove all statements from the source model
+        sourceModel.removeAll()
+
+
+
+        RDFUtils.loadTripleStoreFromScript(cleanedSource, evaluator.params.triplestoreLoaderScript)
+
         //calculate ROC (we do this outside of the CoreEvaluator as we want the ROC printed as well.
         val roc = calculateROC(evaluator, sourceFile, facts, recommendations)
-        println("[+] ROC Curve created: $roc")
         println("[+] Area under the curve: ${roc.calculateAUC()}")
 
         //cleanup -> remove testing directory
@@ -176,8 +193,6 @@ class Test : Callable<Int> {
             conf.createTrueStmtDrawer(evaluator.params.seed, sourceModel, evaluator.params.minPropertyOccurrences, evaluator.params.maxPropertyLimit),
             conf.createFalseStmtDrawer(evaluator.params.seed, sourceModel, evaluator.params.minPropertyOccurrences, evaluator.params.maxPropertyLimit)
         )
-        //Save memory remove all statements from the source model
-        sourceModel.removeAll()
         println("\r[+] Done generating [%d positives, %d negative]facts. Facts are %s".format(evaluator.params.numberOfTrueStatements, evaluator.params.numberOfFalseStatements, facts))
         return facts
     }

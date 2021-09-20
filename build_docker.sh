@@ -1,3 +1,4 @@
+wget https://hobbitdata.informatik.uni-leipzig.de/glisten/hdt.zip
 mvn clean package -P shaded
 
 sudo docker build -f docker/controller.dockerfile -t  git.project-hobbit.eu:4567/glisten/benchmark/controller .

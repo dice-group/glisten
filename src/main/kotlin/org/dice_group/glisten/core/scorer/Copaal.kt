@@ -112,8 +112,11 @@ class NamespaceBasedPredicateFactory(private val namespaces: List<String>, qef: 
      * @param iri String to check if it is inside one of the namespaces
      * @return true if [iri] is in one of the namespaces, false otherwise
      */
-    private fun isInNamespace(iri: String) : Boolean{
+    private fun isInNamespace(iri: String?) : Boolean{
         var check = false
+        if(iri==null){
+            return true;
+        }
         namespaces.forEach {
             if(iri.startsWith(it)) {
                 check = true
