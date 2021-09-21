@@ -5,15 +5,13 @@ configurations:
     sources:
       - "https://hobbitdata.informatik.uni-leipzig.de/glisten/Person.nt"
     trueStmtDrawerOpt:
-      stmtDrawerType: "allowlist"
+      stmtDrawerType: "randomProperties"
       list:
-        - "http://dbpedia.org/ontology/birthPlace"
-        - "http://dbpedia.org/ontology/spouse"
+        - "http://dbpedia.org/ontology/"
     falseStmtDrawerOpt:
-      stmtDrawerType: "allowlist"
+      stmtDrawerType: "randomProperties"
       list:
-        - "http://dbpedia.org/ontology/birthPlace"
-        - "http://dbpedia.org/ontology/spouse"
+        - "http://dbpedia.org/ontology/"
     namespaces:
       - "http://dbpedia.org/ontology/"
 
