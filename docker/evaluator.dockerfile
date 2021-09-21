@@ -1,8 +1,11 @@
 FROM openjdk:11
 
+RUN apt-get update && apt-get upgrade
+RUN apt-get install -y maven
+
 WORKDIR /glisten
 
-ADD hdt.zip 
+ADD hdt.zip . 
 RUN unzip hdt.zip
 
 ADD setupfuseki.sh .

@@ -5,6 +5,7 @@ mv /glisten/main.hdt _main.hdt
 rm /glisten/main.hdt.*
 
 export JVM_ARGS=-Xmx90g
+#export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 
 rm /glisten/second.hdt
 rm /glisten/second.hdt.*

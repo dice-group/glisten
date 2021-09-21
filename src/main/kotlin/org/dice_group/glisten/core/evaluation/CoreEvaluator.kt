@@ -232,10 +232,10 @@ class CoreEvaluator(private val conf: Configuration, val params: EvaluationParam
             // if the score didn't get better, go right, otherwise go up
             if(score > oldScore){
                 directions.add(DIRECTION.UP)
+                oldScore = score
             }else{
                 directions.add(DIRECTION.RIGHT)
             }
-            oldScore = score
             counter += 1.0
         }
         println(directions)
