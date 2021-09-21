@@ -18,17 +18,17 @@ configurations:
       - "http://dbpedia.org/ontology/"
 
   - name: "TestDataset"
-      linksUrlZip: "https://hobbitdata.informatik.uni-leipzig.de/glisten/bp_links.zip"
-      targetUrlZip: "https://hobbitdata.informatik.uni-leipzig.de/glisten/bp_targets.zip"
-      sources:
-        - "https://hobbitdata.informatik.uni-leipzig.de/glisten/birthPlace.nt"
-      trueStmtDrawerOpt:
-        stmtDrawerType: "allowlist"
-        list:
-          - "http://dbpedia.org/ontology/birthPlace"
-      falseStmtDrawerOpt:
-        stmtDrawerType: "allowlist"
-        list:
-          - "http://dbpedia.org/ontology/birthPlace"
-      namespaces:
-        - "http://dbpedia.org/ontology/"
+    linksUrlZip: "https://hobbitdata.informatik.uni-leipzig.de/glisten/bp_links.zip"
+    targetUrlZip: "https://hobbitdata.informatik.uni-leipzig.de/glisten/bp_targets.zip"
+    sources:
+      - "https://hobbitdata.informatik.uni-leipzig.de/glisten/birthPlace.nt"
+    trueStmtDrawerOpt:
+      stmtDrawerType: "allowlist"
+      list:
+        - "http://dbpedia.org/ontology/birthPlace"
+    falseStmtDrawerOpt:
+      stmtDrawerType: "allowlist"
+      list:
+        - "http://dbpedia.org/ontology/birthPlace"
+    namespaces:
+      - "http://dbpedia.org/ontology/"
