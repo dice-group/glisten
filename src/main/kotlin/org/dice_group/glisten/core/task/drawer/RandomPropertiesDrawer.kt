@@ -59,7 +59,8 @@ class RandomPropertiesDrawer(private val namespaces: Collection<String>, seed: L
     }
 
     private fun getPredicates(): List<Property> {
-        return model.listStatements().mapWith { it.predicate }.filterKeep {
+        val predicates =  model.listStatements().mapWith { it.predicate }.toSet()
+        return predicates.filter {
             (model.listObjectsOfProperty(it).toList().size >= minPropOcc) &&
                     namespaces.any { p -> it.toString().startsWith(p) }
         }.toList()

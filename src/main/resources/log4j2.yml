@@ -1,5 +1,5 @@
 Configuration:
-  status: info
+  status: debug
   name: glisten
   properties:
     property:
@@ -21,7 +21,7 @@ Configuration:
         Pattern: "%d [%t] %p [%c] - <%m>%n"
       Filters:
         ThresholdFilter:
-          level: warn
+          level: debug
 
   Loggers:
     logger:
@@ -50,7 +50,7 @@ Configuration:
           - ref: STDOUT
           - ref: File
     Root:
-      level: info
+      level: debug
       AppenderRef:
         - ref: STDOUT
         - ref: File

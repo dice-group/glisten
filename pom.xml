@@ -268,7 +268,6 @@
             <version>0.2.4</version>
         </dependency>
 
-<!--
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
@@ -289,7 +288,7 @@
             <artifactId>log4j-1.2-api</artifactId>
             <version>${log4j.version}</version>
         </dependency>
--->
+
     </dependencies>
 
     <build>
