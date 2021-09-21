@@ -52,6 +52,7 @@ class RandomPropertiesDrawer(private val namespaces: Collection<String>, seed: L
 
         var predicatesToUse = getPredicates()
         predicatesToUse = predicatesToUse.shuffled(random)
+        println("[+] Considering $predicatesToUse predicates")
         predicatesToUse.forEach{
             ret.addAll(super.getStmts(it.toString()))
         }

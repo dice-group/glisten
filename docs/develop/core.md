@@ -99,19 +99,22 @@ and add your Scorer name to the KDoc.
 Here you can see that you'll get some namespaces and a seed and a sampleSize if your algorithm needs that.
 
 
-Additionally you should add the name to the `Test.kt` file so Users can know that they can use your scorer.
+Additionally, you should add the name to the `Test.kt` file so Users can know that they can use your scorer.
 
 Do this by simply adding it to the Option description of the `scorerAlgorithm`  parameter like "The Scorer algorithm to use. Algorithms: [Copaal, SampleCopaal, MyScorer2000]"
 
 
 ### Add your Scorer to Hobbit.
 
-If you want to use the Scorer inside Hobbit, you need to add the Scorer to the `benchmark.ttl` inside the Glisten Hobbit repository at [TODO]().
+If you want to use the Scorer inside Hobbit, you need to add the Scorer to the `benchmark.ttl` inside the Glisten Hobbit repository at [https://git.project-hobbit.eu/glisten/benchmark/](https://git.project-hobbit.eu/glisten/benchmark/).
 
 Add the following to the `benchmark.ttl`
 
 ```ttl
-TODO
+glisten:MyDrawer2000 a glisten:Scorer;
+		rdfs:label "MyDrawer2000"@en;
+		rdfs:comment "The MyDrawer2000 scorer description"@en .	
+
 ```
 
 
