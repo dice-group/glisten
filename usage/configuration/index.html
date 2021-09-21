@@ -567,10 +567,12 @@
 <h3 id="which-facts-we-want-to-consider">Which facts we want to consider</h3>
 <p>Glisten currently implements two types on how to retrieve facts. </p>
 <ul>
+<li>Random Properties</li>
 <li>An Allow List</li>
 <li>A Block List</li>
 </ul>
 <p>The Allow list contains several predicates which are allowed, the block list contains several predicates which aren't allowed.</p>
+<p>The random properties will get random properties from the source model, where each property has to be in the namespace in the provided list.</p>
 <p>These list represent the base. </p>
 <p>Further on we can specify that a property needs to occur at least N times in the source dataset to be actually considered.</p>
 <p>True Facts will be then just drawn randomly based upon thes constrains. </p>
@@ -586,12 +588,12 @@
 <li>The URLs of each source to evaluate against</li>
 <li>The namespaces to use </li>
 <li>For the true fact generation:<ul>
-<li>Which List type to use (allow list or block list)</li>
+<li>Which List type to use (randomProperties, allow list or block list)</li>
 <li>Which predicates to consider</li>
 </ul>
 </li>
 <li>For the false fact generation:<ul>
-<li>Which List type to use (allow list or block list)</li>
+<li>Which List type to use (randomProperties, allow list or block list)</li>
 <li>Which predicates to consider</li>
 </ul>
 </li>
@@ -620,7 +622,7 @@ configurations:
 <p>The benchmark name is <code>test_benchmark</code> and the URL links are both locally (you can use https:// as well and Glisten will download the zips).
 The source is listed using a local URL as well (again would work perfectly fine with an online one)</p>
 <p>Next the <code>trueStmtDrawerOpt</code> and <code>falseStmtDrawerOpt</code> represent the true and false fact generation (true/false statement fact drawer options)
-It defined the statement drawer type (<code>allowlist</code> or <code>blocklist</code>) and the list of predicates in this list. </p>
+It defined the statement drawer type (<code>randomProperties</code>, <code>allowlist</code> or <code>blocklist</code>) and the list of predicates in this list. </p>
 <p>Further on it defines the namespaces to be used which in our case is only <code>http://dbpedia.org/ontology/</code>.
 This will boost the performance immense on datasets like DBpedia</p>
 <h2 id="evaluation-parameters">Evaluation Parameters</h2>
