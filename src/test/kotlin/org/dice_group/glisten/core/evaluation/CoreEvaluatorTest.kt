@@ -118,7 +118,7 @@ class CoreEvaluatorTest {
         //check if script was correctly executed
         val lines = FileUtils.readLines(File("ABCDEFGH_THIS_SHOULDNTEXSISTS.txt"))
 
-        assertEquals("${source.substringBeforeLast("/").replace("file:", "")}/ ${source.substringAfterLast("/")}", lines[0])
+        assertEquals("${File("").absolutePath}/ tmp_source.nt", lines[0])
 
         //check if the script got the correct targets links
         for (i in 1 until lines.size){
@@ -140,16 +140,16 @@ class CoreEvaluatorTest {
         fun createAUCArguments() = Stream.of(
             Arguments.of(mutableListOf(Pair("file:///path/to/target1", 1.0), Pair("file:///path/to/target2", 0.8), Pair("file:///path/to/target3", -1.0)),
                 //we have 4 as we need to include the baseline
-                MockupScorer(listOf(0.1, 0.2, 0.3, 0.3))
+                MockupScorer(listOf(0.0, 1.0, 1.0, 1.0))
                 ,1.0),
             Arguments.of(mutableListOf(Pair("file:///path/to/target1_2", 1.0), Pair("file:///path/to/target2_2", 0.8), Pair("file:///path/to/target3_2", -1.0)),
                 //the mockup scorer acts as it has the actual order of the recommendations, we do not need to change anything at the recommendation list
-                MockupScorer(listOf(0.1, 0.1, 0.1, 0.2))
+                MockupScorer(listOf(0.1, 0.1, 0.1, 0.1))
                 ,0.0),
             Arguments.of(mutableListOf(Pair("file:///path/to/target1_3", 1.0), Pair("file:///path/to/target2_3", 0.8), Pair("file:///path/to/target3_3", -1.0)),
                 //the mockup scorer acts as it has the actual order of the recommendations, we do not need to change anything at the recommendation list
-                MockupScorer(listOf(0.1, 0.3, 0.3, 0.4))
-                ,0.5)
+                MockupScorer(listOf(0.1, 0.6, 0.6, 0.8))
+                ,0.55)
         )
 
         private fun createMockConfig(): Configuration{
@@ -207,7 +207,7 @@ class CoreEvaluatorTest {
             Arguments.of(createMockConfig(),
                 0.0,
                 MockupScorer(listOf(0.4, 0.2, 0.3, 0.4, 0.3)),
-                createROCCurve(listOf(DIRECTION.UP,DIRECTION.RIGHT,DIRECTION.UP,DIRECTION.UP,DIRECTION.RIGHT)),
+                createROCCurve(listOf(DIRECTION.UP,DIRECTION.RIGHT,DIRECTION.RIGHT,DIRECTION.RIGHT,DIRECTION.RIGHT)),
                 // we just need 5 pairs, the rest is irrelevant for this
                 mutableListOf(Pair("", 1.0), Pair("", 1.0),Pair("", 1.0),Pair("", 1.0),Pair("", 1.0))
             )

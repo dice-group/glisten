@@ -36,6 +36,7 @@ class ROCCurve(private val trueStmts: Int, private val falseStmts: Int) {
         points.add(newPoint)
     }
 
+
     /**
      * Adds a new point to the curve by going one step up.
      */

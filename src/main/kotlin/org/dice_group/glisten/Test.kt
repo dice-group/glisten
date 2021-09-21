@@ -249,7 +249,7 @@ class Test : Callable<Int> {
     private fun calculateROC(evaluator: CoreEvaluator, source: String, facts: List<Pair<Statement, Double>>, recommendations: MutableList<Pair<String, Double>>) : ROCCurve{
         val baseline = evaluator.getScore(facts, source, "")
         println("\n[+] Baseline: %f".format(baseline))
-        return evaluator.getBetterROC(baseline, source, facts, recommendations)
+        return evaluator.getROC(baseline, source, facts, recommendations)
 
     }
 }
