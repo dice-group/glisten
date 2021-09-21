@@ -45,7 +45,7 @@ import org.apache.jena.rdf.model.Statement
  * @param maxPropertyLimit The maximum a property, which is not in the [blockList], should be retrieved, if more are available the seed will be used to choose random ones
  *
  */
-class BlockListDrawer(private val blockList: Collection<String>, private val seed: Long, override val model : Model, private val minPropOcc: Int, private val maxPropertyLimit: Int) : StmtDrawer(seed, model, minPropOcc, maxPropertyLimit) {
+class BlockListDrawer(private val blockList: Collection<String>, private val seed: Long, override val model : Model, minPropOcc: Int, private val maxPropertyLimit: Int) : StmtDrawer(seed, model, minPropOcc, maxPropertyLimit) {
 
     override fun getStmts(): MutableList<Statement> {
         val ret = mutableListOf<Statement>()

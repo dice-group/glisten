@@ -1,6 +1,5 @@
 package org.dice_group.glisten.core.config
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import org.dice_group.glisten.core.scorer.Scorer
 import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonParseException
@@ -12,6 +11,7 @@ import org.dice_group.glisten.core.ConfigurationLoadException
 import org.dice_group.glisten.core.task.drawer.BlockListDrawer
 import org.dice_group.glisten.core.task.drawer.StmtDrawer
 import org.dice_group.glisten.core.task.drawer.AllowListDrawer
+import org.dice_group.glisten.core.task.drawer.RandomPropertiesDrawer
 import java.io.File
 import java.io.IOException
 import java.util.*
@@ -87,9 +87,11 @@ class Configuration{
 
     private fun createStmtDrawer(type: String, list: Collection<String>, seed: Long, model: Model, minPropOcc: Int, maxPropertyLimit: Int  ): StmtDrawer {
         //Add your new statement drawer type here to the `when` clause
-        return when{
-            type.lowercase(Locale.getDefault()) == "allowlist" ->
+        return when(type.lowercase(Locale.getDefault())){
+            "allowlist" ->
                 AllowListDrawer(list, seed, model, minPropOcc, maxPropertyLimit)
+            "randomproperties" ->
+                RandomPropertiesDrawer(list, seed, model, minPropOcc, maxPropertyLimit)
             else ->
                 BlockListDrawer(list, seed, model, minPropOcc, maxPropertyLimit)
         }

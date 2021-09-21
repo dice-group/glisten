@@ -42,7 +42,9 @@ class Benchmark : AbstractBenchmarkController() {
     }
 
     override fun init() {
+        println("test")
         super.init()
+        println("init finished")
 
         //init parameters
         val newExpResource: Resource = benchmarkParamModel.getResource(HobbitExperiments.New.uri)
@@ -51,9 +53,11 @@ class Benchmark : AbstractBenchmarkController() {
             .listObjectsOfProperty(benchmarkParamModel.getProperty(CONSTANTS.GLISTEN_PREFIX + "benchmarkName"))
         var datasetName = ""
         if (iterator.hasNext()) {
-            datasetName = benchmarkParamModel.listObjectsOfProperty(ResourceFactory.createResource(iterator.next().asResource().toString()), RDFS.label).next().asLiteral().value.toString()
+            val uri = ResourceFactory.createResource(iterator.next().toString())
+            println(uri)
+            datasetName = benchmarkParamModel.listObjectsOfProperty(uri, RDFS.label).next().asLiteral().value.toString()
         }
-
+        println(datasetName)
 
         //tasg generator seed and #statements
         iterator = benchmarkParamModel
@@ -112,7 +116,7 @@ class Benchmark : AbstractBenchmarkController() {
         if (iterator.hasNext()) {
             scorerAlgorithm = benchmarkParamModel.listObjectsOfProperty(ResourceFactory.createResource(iterator.next().asResource().toString()), RDFS.label).next().asLiteral().value.toString()
         }
-
+        println("Read all parameters.")
 
         // create TG Module
         createTaskGenerators(

@@ -32,10 +32,13 @@ For fact checking:
 
 Glisten currently implements two types on how to retrieve facts. 
 
+* Random Properties
 * An Allow List
 * A Block List
 
 The Allow list contains several predicates which are allowed, the block list contains several predicates which aren't allowed.
+
+The random properties will get random properties from the source model, where each property has to be in the namespace in the provided list.
 
 These list represent the base. 
 
@@ -60,10 +63,10 @@ So each configuration contains only
 * The URLs of each source to evaluate against
 * The namespaces to use 
 * For the true fact generation:
-	* Which List type to use (allow list or block list)
+	* Which List type to use (randomProperties, allow list or block list)
 	* Which predicates to consider
 * For the false fact generation:
-	* Which List type to use (allow list or block list)
+	* Which List type to use (randomProperties, allow list or block list)
 	* Which predicates to consider
 
 The configuration then looks like the following example:
@@ -94,7 +97,7 @@ The benchmark name is `test_benchmark` and the URL links are both locally (you c
 The source is listed using a local URL as well (again would work perfectly fine with an online one)
 
 Next the `trueStmtDrawerOpt` and `falseStmtDrawerOpt` represent the true and false fact generation (true/false statement fact drawer options)
-It defined the statement drawer type (`allowlist` or `blocklist`) and the list of predicates in this list. 
+It defined the statement drawer type (`randomProperties`, `allowlist` or `blocklist`) and the list of predicates in this list. 
 
 Further on it defines the namespaces to be used which in our case is only `http://dbpedia.org/ontology/`.
 This will boost the performance immense on datasets like DBpedia

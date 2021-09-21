@@ -10,10 +10,10 @@ import kotlin.random.Random
  * Abstract Statement Drawer class to use to retrieve facts
  *
  */
-abstract class StmtDrawer(seed: Long, open val model : Model, private val minPropOcc: Int, private val maxPropertyLimit: Int) {
+abstract class StmtDrawer(seed: Long, open val model : Model, val minPropOcc: Int, private val maxPropertyLimit: Int) {
 
     var stmtList: MutableList<Statement> = mutableListOf()
-    private val random = Random(seed)
+    val random = Random(seed)
 
     /**
      * ## Description

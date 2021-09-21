@@ -7,6 +7,7 @@ import org.apache.jena.riot.Lang
 import org.apache.jena.riot.RDFDataMgr
 import org.dice_group.glisten.core.task.drawer.AllowListDrawer
 import org.dice_group.glisten.core.task.drawer.BlockListDrawer
+import org.dice_group.glisten.core.task.drawer.RandomPropertiesDrawer
 import org.dice_group.glisten.core.task.drawer.StmtDrawer
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -97,6 +98,19 @@ class StmtDrawerTest {
         distinctProperties =  drawer.stmtList.map { it.predicate.toString() }.toSet()
         //should only contain http://example.com/1
         assertEquals(setOf("http://example.com/1"), distinctProperties)
+    }
+
+    @Test
+    fun `given a namespaces, the randomList should get the correct properties`(){
+        var drawer = RandomPropertiesDrawer(listOf("http://example.com"), 123, model, 5, 10)
+        drawer.init()
+        var distinctProperties =  drawer.stmtList.map { it.predicate.toString() }.toSet()
+        assertEquals(setOf("http://example.com/1", "http://example.com/2"), distinctProperties)
+
+        drawer = RandomPropertiesDrawer(listOf("http://example.com/2"), 123, model, 1, 10)
+        drawer.init()
+        distinctProperties =  drawer.stmtList.map { it.predicate.toString() }.toSet()
+        assertEquals(setOf("http://example.com/2"), distinctProperties)
     }
 
     //6. max limit
