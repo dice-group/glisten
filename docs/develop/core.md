@@ -111,12 +111,12 @@ If you want to use the Scorer inside Hobbit, you need to add the Scorer to the `
 Add the following to the `benchmark.ttl`
 
 ```ttl
-glisten:MyDrawer2000 a glisten:Scorer;
-		rdfs:label "MyDrawer2000"@en;
+glisten:MyScorer2000 a glisten:Scorer;
+		rdfs:label "MyScorer2000"@en;
 		rdfs:comment "The MyDrawer2000 scorer description"@en .	
 
 ```
-
+Important is that the `rdfs:label` is equal to the value in the `ScorerFactory.createOrDefault`
 
 ## Add your own Fact Generation Base List
 

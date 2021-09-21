@@ -255,8 +255,29 @@ class CoreEvaluator(private val conf: Configuration, val params: EvaluationParam
         return roc
     }
 
-    //TODO clean me up
-    //FIXME the ROC curve can still get worse
+    /**
+     * This will calculate a normalized curve (ranging from 0.0 to 1.0 both on x and the y-Axis)
+     *
+     * The recommendations will be sorted after their recommendation score and be added one after another to the triple store.
+     *
+     * The [Scorer] will calculate the score each time and substract the baseline.
+     *
+     * The result will be a Curve (represented as a [ROCCurve])
+     *
+     * ## Example
+     *
+     * assume the baseline is 0.4 and there are 3 recommendations.
+     * If the scorer returns the following scores [0.5, 0.5, 0.6]
+     * the ROCCurve will be (x,y) : [(0.0, 0.1), (0.5, 0.1), (1.0, 0.2)]
+     *
+     * Hence, if the better fitting recommendations are at the beginning the AUC will be greater,
+     * Additionally, if the recommendations yielding a higher score than the rest is at the beginning, the AUC will be greater as well.
+     *
+     * @param baseline the baseline score
+     * @param source The url of the source string (if locally use file:// as the schema)
+     * @param recommendations the recommendation list, where each target dataset is annotated with a double value from -1 to 1, 1 ,means the dataset is very recommended.
+     * @return The calculated [ROCCurve]
+     */
     fun getROC(baseline: Double, source: String, facts: List<Pair<Statement, Double>>, recommendations: MutableList<Pair<String, Double>>): ROCCurve{
         recommendations.sortByDescending { it.second }
         //steps doesn't ,matter in our case, we don't know the first either way
@@ -268,13 +289,13 @@ class CoreEvaluator(private val conf: Configuration, val params: EvaluationParam
         var counter=0.0
         for((dataset, _) in recommendations){
             if (counter > params.maxRecommendations && params.maxRecommendations > 0){
-                //if maxRecommendations > 0 and the the TOP N datasets were checked, break and return
+                //if maxRecommendations > 0 and the TOP N datasets were checked, break and return
                 return roc
             }
             println("[*] Current dataset to add %s".format(dataset))
             val score = getScore(facts, source, dataset)
             println("[+] %s added, Score: %f".format(dataset, score))
-            //FIXME make use of better functions addUP, ...
+
             roc.addPoint(counter/maxSize, score-baseline)
             counter += 1.0
         }
