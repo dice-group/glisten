@@ -25,6 +25,15 @@ object CONSTANTS {
 
     //Some default values for the configuration and hobbit
 
+    const val SCORER_JSON_ID = "scorerId"
+    const val SCORER_JSON_SCORE = "score"
+    const val COMMAND_SCORER_FINISHED: Byte = 51
+    const val COMMAND_SCORER_READY: Byte = 41
+    const val COMMAND_FACTS: Byte = 61
+    const val SCORER_QUEUE = "scorerName"
+    const val ID = "id"
+    const val RECOMMENDATIONS = "recommendations"
+    const val SOURCE_NAME = "sourceName"
     const val SCRIPT_FILE = "./load_triplestore.sh"
     const val MAX_RECOMMENDATIONS = "maxRecommendations"
     const val STMTDRAWER_TYPE = "stmtDrawerType"

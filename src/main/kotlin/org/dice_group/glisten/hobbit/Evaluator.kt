@@ -37,12 +37,15 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 
-class Evaluator : AbstractEvaluationModule() {
+sealed class Evaluator : AbstractEvaluationModule() {
 
+    var scorerName: String = "Copaal_AvgScore"
+    var sampleSize: Int = 5000
     lateinit var conf: Configuration
+    var benchmarkName = ""
 
-    private val aucList = mutableListOf<Double>()
-    private val times = mutableListOf<Double>()
+    val aucList = mutableListOf<Double>()
+    val times = mutableListOf<Double>()
 
     var maxPropertyLimit = 10
 
@@ -52,7 +55,6 @@ class Evaluator : AbstractEvaluationModule() {
     override fun init() {
         super.init()
 
-        var benchmarkName = ""
         if(System.getenv().containsKey(CONSTANTS.BENCHMARK_NAME)){
             benchmarkName = System.getenv()[CONSTANTS.BENCHMARK_NAME]!!
         }
@@ -71,7 +73,7 @@ class Evaluator : AbstractEvaluationModule() {
         if(System.getenv().containsKey(CONSTANTS.MAX_RECOMMENDATIONS)){
             params.maxRecommendations = System.getenv()[CONSTANTS.MAX_RECOMMENDATIONS]!!.toInt()
         }
-        var sampleSize = 1000
+        sampleSize = 1000
         if(System.getenv().containsKey(CONSTANTS.SAMPLE_SIZE)){
             sampleSize = System.getenv()[CONSTANTS.SAMPLE_SIZE]!!.toInt()
         }
@@ -80,11 +82,17 @@ class Evaluator : AbstractEvaluationModule() {
         }
         var scorer : Scorer = SampleCopaal(params.seed, sampleSize, conf.namespaces)
         if(System.getenv().containsKey(CONSTANTS.SCORER_ALGORITHM)){
+            scorerName = System.getenv()[CONSTANTS.SCORER_ALGORITHM]!!
             scorer = ScorerFactory.createScorerOrDefault(System.getenv()[CONSTANTS.SCORER_ALGORITHM]!!, conf.namespaces, params.seed, sampleSize)
         }
         params.linkedPath="/glisten/links/"
         FileUtils.mkdirs("/glisten/links/")
 
+        createEvaluator(scorer)
+
+    }
+
+    open fun createEvaluator(scorer: Scorer){
         //read config, if config doesn't exist or benchamarkName is not in config will throw an exception
         conf = ConfigurationFactory.findCorrectConfiguration(CONSTANTS.CONFIG_NAME, benchmarkName)
         // create core evaluator using a standard virtuoso endpoint for now.
@@ -92,8 +100,8 @@ class Evaluator : AbstractEvaluationModule() {
 
         //download zips and extract them
         coreEvaluator.init("/")
-
     }
+
 
     override fun evaluateResponse(
         expectedData: ByteArray?,

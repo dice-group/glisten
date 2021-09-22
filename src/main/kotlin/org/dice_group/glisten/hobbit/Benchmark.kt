@@ -29,10 +29,14 @@ import org.slf4j.LoggerFactory
 
 class Benchmark : AbstractBenchmarkController() {
 
+    private var isParallel = false
+
     companion object {
 
         private const val EVALUATION_MODULE_CONTAINER_IMAGE =
             "git.project-hobbit.eu:4567/glisten/benchmark/evaluationmodule"
+        private const val PARALLEL_EVALUATION_MODULE_CONTAINER_IMAGE =
+            "git.project-hobbit.eu:4567/glisten/benchmark/parallelevaluationmodule"
         private const val TASK_GENERATOR_CONTAINER_IMAGE =
             "git.project-hobbit.eu:4567/glisten/benchmark/taskgenerator"
         private const val DATA_GENERATOR_CONTAINER_IMAGE =
@@ -116,6 +120,12 @@ class Benchmark : AbstractBenchmarkController() {
         if (iterator.hasNext()) {
             scorerAlgorithm = benchmarkParamModel.listObjectsOfProperty(ResourceFactory.createResource(iterator.next().asResource().toString()), RDFS.label).next().asLiteral().value.toString()
         }
+
+        iterator = benchmarkParamModel
+            .listObjectsOfProperty(benchmarkParamModel.getProperty(CONSTANTS.GLISTEN_PREFIX + "useParallel"))
+        if (iterator.hasNext()) {
+            isParallel = benchmarkParamModel.listObjectsOfProperty(ResourceFactory.createResource(iterator.next().asResource().toString()), RDFS.label).next().asLiteral().boolean
+        }
         println("Read all parameters.")
 
         // create TG Module
@@ -163,9 +173,15 @@ class Benchmark : AbstractBenchmarkController() {
         // wait for system
         waitForSystemToFinish()
 
-        createEvaluationModule(
-            EVALUATION_MODULE_CONTAINER_IMAGE, emptyArray()
-        )
+        if(isParallel) {
+            createEvaluationModule(
+                PARALLEL_EVALUATION_MODULE_CONTAINER_IMAGE, emptyArray()
+            )
+        }else{
+            createEvaluationModule(
+                EVALUATION_MODULE_CONTAINER_IMAGE, emptyArray()
+            )
+        }
         // wait for the evaluation to finish
         waitForEvalComponentsToFinish()
 

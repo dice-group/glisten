@@ -225,7 +225,7 @@ class CoreEvaluator(private val conf: Configuration, val params: EvaluationParam
                 break
             }
             println("[*] Current dataset to add %s".format(dataset))
-            val score = getScore(facts, source, dataset)
+            val score = getScore(facts, source, listOf(dataset))
             println("[+] %s added, Score: %f".format(dataset, score))
 
             //store the directions
@@ -293,13 +293,13 @@ class CoreEvaluator(private val conf: Configuration, val params: EvaluationParam
                 return roc
             }
             println("[*] Current dataset to add %s".format(dataset))
-            val score = getScore(facts, source, dataset)
+            val score = getScore(facts, source, listOf(dataset))
             println("[+] %s added, Score: %f".format(dataset, score))
 
             roc.addPoint(counter/maxSize, score-baseline)
             counter += 1.0
         }
-
+        println("[+] Curve: $roc")
         return roc
     }
 
@@ -318,6 +318,31 @@ class CoreEvaluator(private val conf: Configuration, val params: EvaluationParam
      */
     fun getScore(facts: List<Pair<Statement, Double>>, sourceName: String, currentDataset: String) : Double{
         if(currentDataset.isNotEmpty()) {
+            //(Download is in init)
+            val linkdataset = "${File(params.linkedPath).toURI()}/" + sourceName.substringAfterLast("/")
+                .removeSuffix(".nt") + "_" + currentDataset.substringAfterLast("/")
+            RDFUtils.loadTripleStoreFromScript(linkdataset, params.triplestoreLoaderScript)
+        }
+        //Let the Scorer run
+        return scorer.getScore(rdfEndpoint, facts)
+    }
+
+
+    /**
+     * Gets the AUC score of running the [Scorer] algorithm against the combination of the current Datasets loaded into the triple store
+     * and the currentDatasets.
+     * Will add the linked datasets named `${linkedPath}/sourceName_currentDataset` to the triple store using the [RDFUtils.loadTripleStoreFromScript] method.
+     * The script which will be used is declared in the provided [EvaluationParameters.triplestoreLoaderScript]
+     *
+     * If you want to use just the source model to generate a baseline, set the currentDataset parameter to an empty list
+     *
+     * @param facts The facts to run the Scorer against.
+     * @param sourceName the old source name will be used to figure out the correct linked dataset.
+     * @param currentDatasets the target datasets name, which link to the source will be added to the store. To use no dataset, use an empty list.
+     * @return the AUC score of the Scorer algorithm
+     */
+    fun getScore(facts: List<Pair<Statement, Double>>, sourceName: String, currentDatasets: List<String>) : Double{
+        currentDatasets.forEach { currentDataset ->
             //(Download is in init)
             val linkdataset = "${File(params.linkedPath).toURI()}/" + sourceName.substringAfterLast("/")
                 .removeSuffix(".nt") + "_" + currentDataset.substringAfterLast("/")
