@@ -636,11 +636,12 @@
 <h3 id="add-your-scorer-to-hobbit">Add your Scorer to Hobbit.</h3>
 <p>If you want to use the Scorer inside Hobbit, you need to add the Scorer to the <code>benchmark.ttl</code> inside the Glisten Hobbit repository at <a href="https://git.project-hobbit.eu/glisten/benchmark/">https://git.project-hobbit.eu/glisten/benchmark/</a>.</p>
 <p>Add the following to the <code>benchmark.ttl</code></p>
-<pre><code class="language-ttl">glisten:MyDrawer2000 a glisten:Scorer;
-        rdfs:label &quot;MyDrawer2000&quot;@en;
+<pre><code class="language-ttl">glisten:MyScorer2000 a glisten:Scorer;
+        rdfs:label &quot;MyScorer2000&quot;@en;
         rdfs:comment &quot;The MyDrawer2000 scorer description&quot;@en . 
 
 </code></pre>
+<p>Important is that the <code>rdfs:label</code> is equal to the value in the <code>ScorerFactory.createOrDefault</code></p>
 <h2 id="add-your-own-fact-generation-base-list">Add your own Fact Generation Base List</h2>
 <p>Create a fact generation base list (or Statmenet Drawer) like the Allow list or Block list </p>
 <p>There are two steps involved.</p>

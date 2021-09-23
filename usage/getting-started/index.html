@@ -594,45 +594,54 @@ For clarification let's move the execution jar file to our current directory</p>
                     [--min-prop-occ=&lt;minPropOcc&gt;] [-N=&lt;benchmarkName&gt;]
                     [-o=&lt;orderFile&gt;] [-s=&lt;scorerAlgorithm&gt;] [-S=&lt;seed&gt;]
                     [--sample-size=&lt;sampleSize&gt;] [-t=&lt;threshold&gt;]
-                    [-T=&lt;numberOfTrueStatements&gt;] &lt;rdfEndpoint&gt;
+                    [-T=&lt;numberOfTrueStatements&gt;] [--timeout=&lt;timeout&gt;]
+                    &lt;rdfEndpoint&gt;
 Executes the glisten workflow without Hobbit and prints the ROC curve at the
 end. Mostly useful for debugging. Uses the load_triplestore.sh script file to
 upload datasets to the triplestore.
-      &lt;rdfEndpoint&gt;   the rdf endpoint to use
-  -c, --config=&lt;configFile&gt;
-                      the config file for glisten. Default: data_config.yml
-      --clean-up      if set, will remove the testing directory which includes
-                        all downloaded and extracted datasets.
+      &lt;rdfEndpoint&gt;         the rdf endpoint to use
+  -c, --config=&lt;configFile&gt; the config file for glisten. Default: data_config.
+                              yaml
+      --clean-up            if set, will remove the testing directory which
+                              includes all downloaded and extracted datasets.
   -F, --no-of-false-stmts=&lt;numberOfFalseStatements&gt;
-                      the no. of false statements to generate. Default=5
-  -h, --help          Show this help message and exit.
+                            the no. of false statements to generate. Default=5
+  -h, --help                Show this help message and exit.
   -m, --max-recommendations=&lt;maxRecommendations&gt;
-                      the no. of max recommendations, 0 or lower means that all
-                        recommendations will be looked at. Default=10
+                            the no. of max recommendations, 0 or lower means
+                              that all recommendations will be looked at.
+                              Default=10
       --max-property-limit=&lt;maxPropertyLimit&gt;
-                      the maximum a property is allowed to be added for
-                        performance reasons. Default=30
+                            the maximum a property is allowed to be added for
+                              performance reasons. Default=30
       --min-prop-occ=&lt;minPropOcc&gt;
-                      the minimum a property has to occur to be considered for
-                        the fact generation. Default=10
+                            the minimum a property has to occur to be
+                              considered for the fact generation. Default=10
   -N, --benchmark-name=&lt;benchmarkName&gt;
-                      The name of the benchmark to use. Name is specified
-                        inside the given configuration file.
+                            The name of the benchmark to use. Name is specified
+                              inside the given configuration file.
   -o, --order-file=&lt;orderFile&gt;
-                      A file containing the order of the recommendations, if
-                        not set, will be random
+                            A file containing the order of the recommendations,
+                              if not set, will be random
   -s, --scorer=&lt;scorerAlgorithm&gt;
-                      The Scorer algorithm to use. Algorithms: [Copaal, SampleCopaal, Copaal_RootMeanSquare, SampleCopaal_RootMeanSquare, Copaal_AvgScore, SampleCopaal_AvgScore]
-  -S, --seed=&lt;seed&gt;   the seed to use for anything random we do. Default is
-                        random
+                            The Scorer algorithm to use. Algorithms: [Copaal,
+                              SampleCopaal, Copaal_RootMeanSquare,
+                              SampleCopaal_RootMeanSquare, Copaal_AvgScore,
+                              SampleCopaal_AvgScore]
+  -S, --seed=&lt;seed&gt;         the seed to use for anything random we do. Default
+                              is random
       --sample-size=&lt;sampleSize&gt;
-                      the sample size to use if Scorer uses samples. Default=30
+                            the sample size to use if Scorer uses samples.
+                              Default=1000
   -t, --scorer-threshold=&lt;threshold&gt;
-                      the threshold to use inside the scorer. A true fact needs
-                        to be better than the threshold. Default=0.0
+                            the threshold to use inside the scorer. A true fact
+                              needs to be better than the threshold. Default=0.0
   -T, --no-of-true-stmts=&lt;numberOfTrueStatements&gt;
-                      the no. of true statements to generate. Default=5
-  -V, --version       Print version information and exit.
+                            the no. of true statements to generate. Default=5
+      --timeout=&lt;timeout&gt;   The timeout in seconds to use for SPARQL queries.
+                              Default is 30s.
+  -V, --version             Print version information and exit.
+
 </code></pre>
 <p>For more information on each parameter have a look at our [Configuration]</p>
 <h2 id="execute-a-benchmark">Execute a benchmark</h2>
