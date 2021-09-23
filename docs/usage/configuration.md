@@ -104,7 +104,7 @@ This will boost the performance immense on datasets like DBpedia
 
 ## Evaluation Parameters
 
-The evaluation parameters can be defined defined by running the benchmark itself (F.e. as CLI arguments) 
+The evaluation parameters can be defined by running the benchmark itself (F.e. as CLI arguments) 
 
 The parameters are listed in the following table
 
@@ -120,6 +120,7 @@ The parameters are listed in the following table
 | number Of False Statements | The no. of false facts to generate | 5 | 
 | benchmarkName | The benchmark to use inside the configuration file | test_benchmark |
 | config file | The Benchmark Configuration File described above | data_config.yml |
+| timeout | The timeout the scorer should use. In seconds  | 30 seconds |
 | order file | see below.  | random order |
 | rdf Endpoint | The SPARQL endpoint to use to load the datasets into and query for fact checking | - |
 

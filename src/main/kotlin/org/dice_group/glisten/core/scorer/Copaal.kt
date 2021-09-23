@@ -26,9 +26,10 @@ import java.util.concurrent.TimeUnit
  * For more details on how Copaal works, have a look at [https://github.com/dice-group/COPAAL/](https://github.com/dice-group/COPAAL/)
  *
  * @param namespaces The namespaces to consider while fact checking.
+ * @param timeout the timeout in seconds to use
  * @param scoreMethod  The score method to use. [AUC, RootMeanSqrt, AverageScore]. Default is AUC.
  */
-open class Copaal(namespaces: List<String>, scoreMethod : String = "AUC") : Scorer(namespaces, scoreMethod){
+open class Copaal(namespaces: List<String>, timeout: Long, scoreMethod : String = "AUC") : Scorer(namespaces, timeout, scoreMethod){
 
     /**
      * Creates a COPAAL [PathBasedFactChecker] using an [QueryExecutionFactoryHttp] with a delay of 200ms and a timeout of 30s
@@ -41,10 +42,10 @@ open class Copaal(namespaces: List<String>, scoreMethod : String = "AUC") : Scor
     open fun createFactChecker(endpoint: String, namespaces: List<String>): IFactChecker{
         var qef : QueryExecutionFactory = QueryExecutionFactoryHttp(endpoint)
         qef = QueryExecutionFactoryDelay(qef, 200L)
-        qef = QueryExecutionFactoryTimeout(qef, 30L, TimeUnit.SECONDS, 30L, TimeUnit.SECONDS)
+        qef = QueryExecutionFactoryTimeout(qef, 120L, TimeUnit.SECONDS, 120L, TimeUnit.SECONDS)
 
         return PathBasedFactChecker(
-            NamespaceBasedPredicateFactory(namespaces, qef),
+            PredicateFactory(qef),
             SPARQLBasedSOPathSearcher(
                 qef,
                 3,

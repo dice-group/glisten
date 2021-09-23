@@ -48,6 +48,7 @@ sealed class Evaluator : AbstractEvaluationModule() {
     val times = mutableListOf<Double>()
 
     var maxPropertyLimit = 10
+    var timeout = 30L
 
     val params = EvaluationParameters.createDefault()
     lateinit var coreEvaluator: CoreEvaluator
@@ -80,10 +81,13 @@ sealed class Evaluator : AbstractEvaluationModule() {
         if(System.getenv().containsKey(CONSTANTS.SEED)){
             params.seed = System.getenv()[CONSTANTS.SEED]!!.toLong()
         }
-        var scorer : Scorer = SampleCopaal(params.seed, sampleSize, conf.namespaces)
+        if(System.getenv().containsKey(CONSTANTS.TIMEOUT)){
+            timeout = System.getenv()[CONSTANTS.TIMEOUT]!!.toLong()
+        }
+        var scorer : Scorer = SampleCopaal(params.seed, sampleSize, conf.namespaces, timeout)
         if(System.getenv().containsKey(CONSTANTS.SCORER_ALGORITHM)){
             scorerName = System.getenv()[CONSTANTS.SCORER_ALGORITHM]!!
-            scorer = ScorerFactory.createScorerOrDefault(System.getenv()[CONSTANTS.SCORER_ALGORITHM]!!, conf.namespaces, params.seed, sampleSize)
+            scorer = ScorerFactory.createScorerOrDefault(System.getenv()[CONSTANTS.SCORER_ALGORITHM]!!, conf.namespaces, timeout, params.seed, sampleSize)
         }
         params.linkedPath="/glisten/links/"
         FileUtils.mkdirs("/glisten/links/")

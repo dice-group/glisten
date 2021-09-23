@@ -215,7 +215,7 @@ class CoreEvaluatorTest {
     }
 }
 
-class MockupScorer(private val scores: List<Double>) : Scorer(emptyList()){
+class MockupScorer(private val scores: List<Double>) : Scorer(emptyList(), 30L){
 
     private var counter=0
 

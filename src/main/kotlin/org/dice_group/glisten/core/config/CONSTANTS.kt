@@ -25,6 +25,7 @@ object CONSTANTS {
 
     //Some default values for the configuration and hobbit
 
+    const val TIMEOUT = "timeout"
     const val SCORER_JSON_ID = "scorerId"
     const val SCORER_JSON_SCORE = "score"
     const val COMMAND_SCORER_FINISHED: Byte = 51

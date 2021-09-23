@@ -30,7 +30,7 @@ class ScorerTest {
 
 }
 
-class MockScorer : Scorer(emptyList()){
+class MockScorer : Scorer(emptyList(), 30L){
 
     override fun getScores(endpoint: String, facts: List<Pair<Statement, Double>>): MutableList<Pair<Double, Double>> {
         return mutableListOf()

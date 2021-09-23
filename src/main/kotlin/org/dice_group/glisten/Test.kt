@@ -80,6 +80,9 @@ class Test : Callable<Int> {
     @CommandLine.Option(names = ["-s", "--scorer"], description = ["The Scorer algorithm to use. Algorithms: [Copaal, SampleCopaal, Copaal_RootMeanSquare, SampleCopaal_RootMeanSquare, Copaal_AvgScore, SampleCopaal_AvgScore] "])
     var scorerAlgorithm = "Copaal"
 
+    @CommandLine.Option(names = ["--timeout"], description = ["The timeout in seconds to use for SPARQL queries. Default is 30s. "])
+    var timeout = 30L
+
     @CommandLine.Option(names = ["-N", "--benchmark-name"], description = ["The name of the benchmark to use. Name is specified inside the given configuration file."])
     var benchmarkName = "test_benchmark"
 
@@ -198,7 +201,7 @@ class Test : Callable<Int> {
     }
 
     private fun createEvaluator(conf: Configuration): CoreEvaluator {
-        val scorer = ScorerFactory.createScorerOrDefault(scorerAlgorithm, conf.namespaces, seed, sampleSize)
+        val scorer = ScorerFactory.createScorerOrDefault(scorerAlgorithm, conf.namespaces, timeout, seed, sampleSize)
         scorer.threshold = threshold
         val params = EvaluationParameters(
             seed,

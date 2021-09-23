@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory
 
 class Benchmark : AbstractBenchmarkController() {
 
+    private var evalParams = emptyArray<String>()
     private var isParallel = false
 
     companion object {
@@ -115,6 +116,13 @@ class Benchmark : AbstractBenchmarkController() {
         }
 
         iterator = benchmarkParamModel
+            .listObjectsOfProperty(benchmarkParamModel.getProperty(CONSTANTS.GLISTEN_PREFIX + "timeout"))
+        var timeout = 30L
+        if (iterator.hasNext()) {
+            timeout = iterator.next().asLiteral().long
+        }
+
+        iterator = benchmarkParamModel
             .listObjectsOfProperty(benchmarkParamModel.getProperty(CONSTANTS.GLISTEN_PREFIX + "scorerAlgorithm"))
         var scorerAlgorithm = "SampleCopaal"
         if (iterator.hasNext()) {
@@ -144,19 +152,22 @@ class Benchmark : AbstractBenchmarkController() {
 
         createEvaluationStorage(
             DEFAULT_EVAL_STORAGE_IMAGE, arrayOf(
-                CONSTANTS.BENCHMARK_NAME + "=" + datasetName,
                 Constants.ACKNOWLEDGEMENT_FLAG_KEY + "=true",
-                DEFAULT_EVAL_STORAGE_PARAMETERS[0],
-                CONSTANTS.SEED + "=" + seed,
-                CONSTANTS.MAX_RECOMMENDATIONS + "=" + maxRecommendations,
-                CONSTANTS.NUMBER_OF_TRUE_STATEMENTS + "=" + noOfTrueStatements,
-                CONSTANTS.NUMBER_OF_FALSE_STATEMENTS + "=" + noOfFalseStatements,
-                CONSTANTS.MIN_PROP_OCC + "=" + minPropOcc ,
-                CONSTANTS.MAX_PROPERTY_LIMIT + "=" + maxPropertyLimit,
-                CONSTANTS.SAMPLE_SIZE + "=" + sampleSize,
-                CONSTANTS.SCORER_ALGORITHM + "=" +scorerAlgorithm
+
             )
         )
+
+        evalParams = arrayOf( DEFAULT_EVAL_STORAGE_PARAMETERS[0],
+            CONSTANTS.BENCHMARK_NAME + "=" + datasetName,
+            CONSTANTS.SEED + "=" + seed,
+            CONSTANTS.MAX_RECOMMENDATIONS + "=" + maxRecommendations,
+            CONSTANTS.NUMBER_OF_TRUE_STATEMENTS + "=" + noOfTrueStatements,
+            CONSTANTS.NUMBER_OF_FALSE_STATEMENTS + "=" + noOfFalseStatements,
+            CONSTANTS.MIN_PROP_OCC + "=" + minPropOcc ,
+            CONSTANTS.MAX_PROPERTY_LIMIT + "=" + maxPropertyLimit,
+            CONSTANTS.SAMPLE_SIZE + "=" + sampleSize,
+            CONSTANTS.TIMEOUT + "=" + timeout,
+            CONSTANTS.SCORER_ALGORITHM + "=" +scorerAlgorithm)
 
         waitForComponentsToInitialize()
 
@@ -175,11 +186,12 @@ class Benchmark : AbstractBenchmarkController() {
 
         if(isParallel) {
             createEvaluationModule(
-                PARALLEL_EVALUATION_MODULE_CONTAINER_IMAGE, emptyArray()
+                PARALLEL_EVALUATION_MODULE_CONTAINER_IMAGE,
+                evalParams
             )
         }else{
             createEvaluationModule(
-                EVALUATION_MODULE_CONTAINER_IMAGE, emptyArray()
+                EVALUATION_MODULE_CONTAINER_IMAGE, evalParams
             )
         }
         // wait for the evaluation to finish

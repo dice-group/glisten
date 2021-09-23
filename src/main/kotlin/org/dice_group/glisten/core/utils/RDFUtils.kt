@@ -1,19 +1,38 @@
 package org.dice_group.glisten.core.utils
 
+import org.apache.jena.graph.NodeFactory
 import org.apache.jena.graph.Triple
+import org.apache.jena.query.ARQ
 import org.apache.jena.rdf.model.Model
 import org.apache.jena.rdf.model.ModelFactory
+import org.apache.jena.riot.Lang
 import org.apache.jena.riot.RDFDataMgr
+import org.apache.jena.riot.RIOT
 import org.apache.jena.riot.system.StreamRDFBase
 import org.apache.jena.shared.JenaException
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.net.URI
 import kotlin.jvm.Throws
+
+fun main(args: Array<String>) {
+    ARQ.init()
+    RIOT.init()
+    val streamer = StreamRDFToAscii()
+    println("${args[0]} ${args[1]}")
+    RDFDataMgr.parse(streamer, args[0])
+
+    RDFDataMgr.write(FileOutputStream(args[1]), streamer.model, Lang.NT)
+
+}
 
 /**
  * Util class to stream RDF files in memory or into triplestores using scripts.
  */
 object RDFUtils {
+
+
 
     /**
      * ## Description
@@ -122,6 +141,55 @@ class StreamRDFNoLiteral : StreamRDFBase() {
         //simply ignore literals
         if(!p0.`object`.isLiteral){
             model.graph.add(p0)
+        }
+        //some output, to see that it's still working
+        if((model.size() % 100000) == 0L){
+            print("\r[-] Processed: %s triples".format(model.size()))
+        }
+    }
+
+
+}
+
+
+private class StreamRDFToAscii : StreamRDFBase() {
+
+    val model: Model = ModelFactory.createDefaultModel()
+
+    //we need this to work with prefixes
+    override fun prefix(prefix: String?, iri: String?) {
+        try {
+            model.graph.prefixMapping.setNsPrefix(prefix, iri)
+        } catch (var4: JenaException) {
+        }
+    }
+
+
+    override fun triple(p0: Triple) {
+        //simply ignore literals
+        if(!p0.`object`.isLiteral){
+            try {
+                val subject = if (p0.subject.isURI) {
+                    NodeFactory.createURI(URI.create(p0.subject.toString(false)).toASCIIString())
+                } else {
+                    p0.subject
+                }
+                val predicate = if (p0.predicate.isURI) {
+                    NodeFactory.createURI(URI.create(p0.predicate.toString(false)).toASCIIString())
+                } else {
+                    p0.predicate
+                }
+                val `object` = if (p0.`object`.isURI) {
+                    NodeFactory.createURI(URI.create(p0.`object`.toString(false)).toASCIIString())
+                } else {
+                    p0.`object`
+                }
+                val newTriple = Triple(subject, predicate, `object`)
+
+                model.graph.add(newTriple)
+            }catch(e: Exception ){
+                println("[!!] Warning: $p0 not valid")
+            }
         }
         //some output, to see that it's still working
         if((model.size() % 100000) == 0L){

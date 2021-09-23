@@ -28,6 +28,8 @@ class Scorer : AbstractCommandReceivingComponent() {
     private val datasets = mutableListOf<String>()
     private var id = 0
 
+    private var timeout = 30L
+
     private val factsReceivedMutex = Semaphore(0)
 
     override fun run() {
@@ -51,11 +53,13 @@ class Scorer : AbstractCommandReceivingComponent() {
         val seed = System.getenv()[CONSTANTS.SEED]!!.toLong()
         val benchmarkName = System.getenv()[CONSTANTS.BENCHMARK_NAME]!!
         val recommendationsString = System.getenv()[CONSTANTS.RECOMMENDATIONS]!!
+        val timeout = System.getenv()[CONSTANTS.TIMEOUT]!!.toLong()
+
         createDatasets(recommendationsString)
 
         val conf = ConfigurationFactory.findCorrectConfiguration(CONSTANTS.CONFIG_NAME, benchmarkName)
 
-        val scorer = ScorerFactory.createScorerOrDefault(scorerName, conf.namespaces, seed, sampleSize)
+        val scorer = ScorerFactory.createScorerOrDefault(scorerName, conf.namespaces, timeout, seed, sampleSize)
         coreEvaluator = CoreEvaluator(conf, params, rdfEndpoint, scorer)
         coreEvaluator?.init(".")
     }

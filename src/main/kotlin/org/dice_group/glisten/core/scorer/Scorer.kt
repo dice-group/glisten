@@ -15,11 +15,12 @@ import kotlin.math.sqrt
  * To create a Scorer use the [ScorerFactory].
  *
  * @param namespaces The namespaces to use/consider creating the score.
+ * @param timeout the timeout in seconds to use
  * @param scoreMethod The score method to use. [AUC, RootMeanSqrt, AverageScore]. Default is AUC.
  *
  * @see ScorerFactory
  */
-abstract class Scorer(val namespaces: List<String>, val scoreMethod: String = "AUC") {
+abstract class Scorer(val namespaces: List<String>, val timeout: Long, val scoreMethod: String = "AUC") {
 
     var threshold = 0.0
 
@@ -173,19 +174,20 @@ object ScorerFactory{
      *
      * @param scorerAlgorithm The name of the scorer algorithm e.g COPAAL
      * @param namespaces The list of namespaces which should be used
+     * @param timeout the timeout in seconds to use
      * @param seed seed to use for any random activity
      * @param sampleSize If the Scorer uses samples, describes the sample size
      * @return The Scorer Algorithm with the name or the Default scorer algorithm: Copaal
      */
-    fun createScorerOrDefault(scorerAlgorithm: String, namespaces: List<String>, seed: Long, sampleSize: Int) : Scorer  {
-        var scorer : Scorer = Copaal(namespaces)
+    fun createScorerOrDefault(scorerAlgorithm: String, namespaces: List<String>, timeout: Long, seed: Long, sampleSize: Int) : Scorer  {
+        var scorer : Scorer = Copaal(namespaces, timeout)
         when(scorerAlgorithm.lowercase(Locale.getDefault())){
-            "copaal" -> scorer = Copaal(namespaces)
-            "samplecopaal" -> {println("[+] Using SampleCopaal"); scorer = SampleCopaal(seed, sampleSize, namespaces)}
-            "copaal_rootmeansquare" -> scorer = Copaal(namespaces, "RootMeanSquare")
-            "samplecopaal_rootmeansquare" -> {println("[+] Using SampleCopaal[RootMeanSquare]"); scorer = SampleCopaal(seed, sampleSize, namespaces,"RootMeanSquare")}
-            "copaal_avgscore" -> scorer = Copaal(namespaces, "AverageScore")
-            "samplecopaal_avgscore" -> {println("[+] Using SampleCopaal[AvgScore]"); scorer = SampleCopaal(seed, sampleSize, namespaces,"AverageScore")}
+            "copaal" -> scorer = Copaal(namespaces, timeout)
+            "samplecopaal" -> {println("[+] Using SampleCopaal"); scorer = SampleCopaal(seed, sampleSize, namespaces, timeout)}
+            "copaal_rootmeansquare" -> scorer = Copaal(namespaces, timeout, "RootMeanSquare")
+            "samplecopaal_rootmeansquare" -> {println("[+] Using SampleCopaal[RootMeanSquare]"); scorer = SampleCopaal(seed, sampleSize, namespaces, timeout,"RootMeanSquare")}
+            "copaal_avgscore" -> scorer = Copaal(namespaces, timeout, "AverageScore")
+            "samplecopaal_avgscore" -> {println("[+] Using SampleCopaal[AvgScore]"); scorer = SampleCopaal(seed, sampleSize, namespaces,timeout,"AverageScore")}
         }
         return scorer
     }
