@@ -6,4 +6,4 @@ if git rev-parse "$1" >/dev/null 2>&1; then
 else
   echo "Tag $1 does not exist - good to go."
   exit 0
-fic
+fi
