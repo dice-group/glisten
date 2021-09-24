@@ -1,12 +1,12 @@
 Configuration:
-  status: error
+  status: debug
   name: glisten
   properties:
     property:
       name: filename
       value: glisten.log
   thresholdFilter:
-    level: error
+    level: debug
   appenders:
     Console:
       name: STDOUT
@@ -21,7 +21,7 @@ Configuration:
         Pattern: "%d [%t] %p [%c] - <%m>%n"
       Filters:
         ThresholdFilter:
-          level: error
+          level: debug
 
   Loggers:
     logger:
@@ -63,7 +63,7 @@ Configuration:
           - ref: File
 
     Root:
-      level: error
+      level: debug
       AppenderRef:
         - ref: STDOUT
         - ref: File

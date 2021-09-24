@@ -32,6 +32,7 @@ class Benchmark : AbstractBenchmarkController() {
     private var evalParams = emptyArray<String>()
     private var isParallel = false
 
+
     companion object {
 
         private const val EVALUATION_MODULE_CONTAINER_IMAGE =
@@ -46,10 +47,9 @@ class Benchmark : AbstractBenchmarkController() {
         private val LOGGER = LoggerFactory.getLogger(this::class.java.name)
     }
 
+
     override fun init() {
-        println("test")
         super.init()
-        println("init finished")
 
         //init parameters
         val newExpResource: Resource = benchmarkParamModel.getResource(HobbitExperiments.New.uri)

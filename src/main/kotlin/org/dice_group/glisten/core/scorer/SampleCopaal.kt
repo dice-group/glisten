@@ -14,6 +14,7 @@ import org.dice_research.fc.paths.scorer.count.decorate.CachingSamplingCountRetr
 import org.dice_research.fc.paths.scorer.count.decorate.SamplingCountRetrieverDecorator
 import org.dice_research.fc.paths.scorer.count.max.DefaultMaxCounter
 import org.dice_research.fc.paths.search.SPARQLBasedSOPathSearcher
+import org.dice_research.fc.paths.search.SubSelectBasedSOPathSearcher
 import org.dice_research.fc.sum.FixedSummarist
 import java.util.concurrent.TimeUnit
 
@@ -38,7 +39,7 @@ class SampleCopaal(private val seed : Long, private val sampleSize: Int, namespa
 
         return PathBasedFactChecker(
             PredicateFactory(qef),
-            SPARQLBasedSOPathSearcher(
+            SubSelectBasedSOPathSearcher(
                 qef,
                 3,
                 listOf(

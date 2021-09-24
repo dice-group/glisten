@@ -20,7 +20,7 @@ else
 fi
 
 export SERVER_MEM=90g
-cd /glisten/hdt-java/hdt-fuseki/ && ./bin/hdtEndpoint.sh -q --timeout=60000 --hdt /glisten/main.hdt /ds > /dev/null &
+cd /glisten/hdt-java/hdt-fuseki/ && ./bin/hdtEndpoint.sh -q --timeout=320000 --hdt /glisten/main.hdt /ds > /dev/null &
 cd /glisten/
 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://localhost:3030/ds/sparql?query=SELECT+%3Fs+%7B%3Fs+%3Fp+%3Fo%7D+LIMIT+1)" != "200" ]]; do sleep 5; done'
 curl http://localhost:3030/ds/sparql?query=SELECT+%28COUNT%28%2A%29+AS+%3Fco+%29+%7B%3Fs+%3Fp+%3Fo%7D
