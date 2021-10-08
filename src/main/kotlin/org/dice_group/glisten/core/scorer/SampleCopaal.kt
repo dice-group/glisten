@@ -39,7 +39,7 @@ class SampleCopaal(private val seed : Long, private val sampleSize: Int, namespa
 
         return PathBasedFactChecker(
             PredicateFactory(qef),
-            SubSelectBasedSOPathSearcher(
+            SPARQLBasedSOPathSearcher(
                 qef,
                 3,
                 listOf(

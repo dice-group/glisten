@@ -48,3 +48,4 @@ build
 *.settings
 *.classpath
 
+/target/
