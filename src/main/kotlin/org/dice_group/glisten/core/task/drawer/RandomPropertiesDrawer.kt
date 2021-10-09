@@ -2,11 +2,12 @@ package org.dice_group.glisten.core.task.drawer
 
 import org.apache.jena.rdf.model.*
 import org.apache.jena.util.iterator.ExtendedIterator
+import org.dice_group.glisten.core.utils.jena.ObjectPropertyBasedSelector
 
 /**
  * ## Description
  *
- * The RandomPropertiesDrawer gets random [Statement]s having a property which occur at least a certain amount and are in of the provided namespaces
+ * The RandomPropertiesDrawer gets random [Statement]s having a property which occurs at least a certain amount and are in of the provided namespaces. It should be noted that only object properties are used, i.e., statements that have a literal as object are not taken into account.
  *
  * Furthermore, it uses a given [Model] to retrieve all Statements using the namespaces list and checks
  * at the random draw of a statement if the property fits the constraint having at least the minimum amount of occurrences and
@@ -43,7 +44,7 @@ import org.apache.jena.util.iterator.ExtendedIterator
  * @param maxPropertyLimit The maximum a property should be retrieved, if more are available the seed will be used to choose random ones
  *
  */
-class RandomPropertiesDrawer(private val namespaces: Collection<String>, seed: Long, override val model : Model, minPropOcc: Int, maxPropertyLimit: Int) : StmtDrawer(seed, model, minPropOcc, maxPropertyLimit) {
+class RandomPropertiesDrawer(private val namespaces: Collection<String>, seed: Long, override val model: Model, minPropOcc: Int, maxPropertyLimit: Int) : StmtDrawer(seed, model, minPropOcc, maxPropertyLimit) {
 
 
     override fun getStmts(): MutableList<Statement> {
@@ -53,16 +54,16 @@ class RandomPropertiesDrawer(private val namespaces: Collection<String>, seed: L
         var predicatesToUse = getPredicates()
         predicatesToUse = predicatesToUse.shuffled(random)
         println("\r[+] Considering $predicatesToUse predicates")
-        predicatesToUse.forEach{
+        predicatesToUse.forEach {
             ret.addAll(super.getStmts(it.toString()))
         }
         return ret
     }
 
     private fun getPredicates(): List<Property> {
-        val predicates =  model.listStatements().mapWith { it.predicate }.toSet()
+        val predicates = model.listStatements().mapWith { it.predicate }.toSet()
         return predicates.filter {
-            (model.listStatements(null, it, null as RDFNode?).toList().size >= minPropOcc) &&
+            (model.listStatements(ObjectPropertyBasedSelector(it)).toList().size >= minPropOcc) &&
                     namespaces.any { p -> it.toString().startsWith(p) }
         }.toList()
     }

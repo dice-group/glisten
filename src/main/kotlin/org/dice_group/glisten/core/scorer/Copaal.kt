@@ -13,7 +13,6 @@ import org.dice_research.fc.paths.scorer.count.PropPathBasedPairCountRetriever
 import org.dice_research.fc.paths.scorer.count.decorate.CachingCountRetrieverDecorator
 import org.dice_research.fc.paths.scorer.count.max.DefaultMaxCounter
 import org.dice_research.fc.paths.search.SPARQLBasedSOPathSearcher
-import org.dice_research.fc.paths.search.SubSelectBasedSOPathSearcher
 import org.dice_research.fc.sparql.filter.IRIFilter
 import org.dice_research.fc.sum.FixedSummarist
 import java.util.concurrent.TimeUnit
@@ -47,7 +46,7 @@ open class Copaal(namespaces: List<String>, timeout: Long, scoreMethod : String 
 
         return PathBasedFactChecker(
             PredicateFactory(qef),
-            SubSelectBasedSOPathSearcher(
+            SPARQLBasedSOPathSearcher(
                 qef,
                 3,
                 listOf(
