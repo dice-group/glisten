@@ -1,0 +1,13 @@
+[ {
+  "score" : "0.8",
+  "evidence" : "<http://dbpedia.org/property/imageLink>/^<http://dbpedia.org/property/imageSize>/<http://dbpedia.org/property/publisher>",
+  "verbalization" : null
+}, {
+  "score" : "0.7",
+  "evidence" : "<http://dbpedia.org/property/system>/^<http://dbpedia.org/property/date>/<http://dbpedia.org/property/publisher>",
+  "verbalization" : null
+}, {
+  "score" : "0.5",
+  "evidence" : "<http://dbpedia.org/property/skills>/^<http://dbpedia.org/property/skills>/<http://dbpedia.org/property/publisher>",
+  "verbalization" : null
+} ]

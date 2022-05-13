@@ -1,0 +1,23 @@
+<http://example.com/res/1> <http://example.com/1> <http://example.com/res/2> .
+<http://example.com/res/1> <http://example.com/2> <http://example.com/res/3> .
+<http://example.com/res/1> <http://example.com/3> <http://example.com/res/4> .
+
+<http://example.com/res/2> <http://example.com/1> <http://example.com/res/3> .
+<http://example.com/res/2> <http://example.com/2> <http://example.com/res/4> .
+<http://example.com/res/2> <http://example.com/3> <http://example.com/res/5> .
+
+<http://example.com/res/3> <http://example.com/1> <http://example.com/res/4> .
+<http://example.com/res/3> <http://example.com/2> <http://example.com/res/5> .
+<http://example.com/res/3> <http://example.com/3> <http://example.com/res/6> .
+
+<http://example.com/res/4> <http://example.com/1> <http://example.com/res/5> .
+<http://example.com/res/4> <http://example.com/2> <http://example.com/res/6> .
+
+<http://example.com/res/5> <http://example.com/1> <http://example.com/res/6> .
+<http://example.com/res/5> <http://example.com/2> <http://example.com/res/7> .
+
+<http://example.com/res/6> <http://example.com/1> <http://example.com/res/7> .
+<http://example.com/res/7> <http://example.com/1> <http://example.com/res/8> .
+<http://example.com/res/8> <http://example.com/1> <http://example.com/res/9> .
+<http://example.com/res/9> <http://example.com/1> <http://example.com/res/10> .
+<http://example.com/res/10> <http://example.com/1> <http://example.com/res/11> .

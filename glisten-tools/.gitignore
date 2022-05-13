@@ -49,3 +49,13 @@ build
 *.classpath
 
 /target/
+/temp/
+
+# glisten data files
+*.nt
+*.csv
+*.tsv
+*.object
+*.paths
+*.txt
+/paths/

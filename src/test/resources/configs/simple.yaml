@@ -1,0 +1,56 @@
+configurations:
+  - name: "benchmark1"
+    linksUrlZip: "https://benchmark1_links.zip"
+    targetUrlZip: "https://benchmark1_targets.zip"
+    sources:
+      - "benchmark1_1"
+      - "benchmark1_2"
+      - "benchmark1_3"
+    trueStmtDrawerOpt:
+      stmtDrawerType: "blocklist"
+      list:
+        - "benchmark1"
+    falseStmtDrawerOpt:
+      stmtDrawerType: "allowlist"
+      list:
+        - "benchmark1"
+    namespaces:
+      - "benchmark1_1"
+      - "benchmark1_2"
+  - name: "benchmark2"
+    linksUrlZip: "https://benchmark2_links.zip"
+    targetUrlZip: "https://benchmark2_targets.zip"
+    sources:
+      - "benchmark2_1"
+      - "benchmark2_2"
+      - "benchmark2_3"
+    trueStmtDrawerOpt:
+      stmtDrawerType: "blocklist"
+      list:
+        - "benchmark2"
+    falseStmtDrawerOpt:
+      stmtDrawerType: "allowlist"
+      list:
+        - "benchmark2"
+    namespaces:
+      - "benchmark2_1"
+      - "benchmark2_2"
+
+  - name: "benchmark3"
+    linksUrlZip: "https://benchmark3_links.zip"
+    targetUrlZip: "https://benchmark3_targets.zip"
+    sources:
+      - "benchmark3_1"
+    trueStmtDrawerOpt:
+      stmtDrawerType: "AlLoWLIST"
+      list:
+        - "benchmark3"
+        - "3kramhcneb"
+    falseStmtDrawerOpt:
+      stmtDrawerType: "test"
+      list:
+        - "benchmark3_false"
+        - "eslaf_3kramhcneb"
+    namespaces:
+      - "benchmark3_1"
+      - "benchmark3_2"
