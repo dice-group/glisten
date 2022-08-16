@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit
  * @param scoreMethod  The score method to use. [AUC, RootMeanSqrt, AverageScore]. Default is AUC.
 
  */
-class SampleCopaal(private val seed : Long, private val sampleSize: Int, namespaces: List<String>, timeout: Long, scoreMethod : String = "AUC") : Copaal(namespaces, timeout, scoreMethod) {
+class SampleCopaal(private val seed : Long, private val sampleSize: Int, namespaces: List<String>, timeout: Long, scoreMethods: Array<String> = arrayOf<String>("AUC")) : Copaal(namespaces, timeout, scoreMethods) {
 
     override fun createFactChecker(endpoint: String, namespaces: List<String>): IFactChecker {
         var qef : QueryExecutionFactory = QueryExecutionFactoryHttp(endpoint)

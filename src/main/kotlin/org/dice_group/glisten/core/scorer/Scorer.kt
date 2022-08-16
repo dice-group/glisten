@@ -20,7 +20,7 @@ import kotlin.math.sqrt
  *
  * @see ScorerFactory
  */
-abstract class Scorer(val namespaces: List<String>, val timeout: Long, val scoreMethod: String = "AUC") {
+abstract class Scorer(val namespaces: List<String>, val timeout: Long, val scoreMethods: Array<String> = arrayOf<String>("AUC")) {
 
     var threshold = 0.0
 
@@ -38,7 +38,7 @@ abstract class Scorer(val namespaces: List<String>, val timeout: Long, val score
      * @param facts the facts to calculate the scores against , each pair consists of the statement and its trueness value
      * @return the AUC score
      */
-    open fun getScore(endpoint: String, facts: List<Pair<Statement, Double>>) : Double{
+    open fun getScore(endpoint: String, facts: List<Pair<Statement, Double>>) : Map<String, Double> {
         //get the actual score
         val scores = getScores(endpoint, facts)
         //sort by veracity score s.t. the highest score is on top
@@ -51,12 +51,16 @@ abstract class Scorer(val namespaces: List<String>, val timeout: Long, val score
             }
         }
         //choose one method and return the method
-        return when(scoreMethod.lowercase(Locale.getDefault())){
-            "rootmeansqrt" -> getSqrtMeanScore(scores)
-            "auc" -> getAUC(scores)
-            "averagescore" -> getAverageScore(scores)
-            else -> getAUC(scores)
+        val results = emptyMap<String, Double>()
+        for(scoreMethod in scoreMethods) {
+            results.put(scoreMethod, when(scoreMethod.lowercase(Locale.getDefault())){
+                "rootmeansqrt" -> getSqrtMeanScore(scores)
+                "auc" -> getAUC(scores)
+                "averagescore" -> getAverageScore(scores)
+                else -> getAUC(scores)
+            })
         }
+        return results
     }
 
     /**
@@ -182,12 +186,12 @@ object ScorerFactory{
     fun createScorerOrDefault(scorerAlgorithm: String, namespaces: List<String>, timeout: Long, seed: Long, sampleSize: Int) : Scorer  {
         var scorer : Scorer = Copaal(namespaces, timeout)
         when(scorerAlgorithm.lowercase(Locale.getDefault())){
-            "copaal" -> scorer = Copaal(namespaces, timeout)
-            "samplecopaal" -> {println("[+] Using SampleCopaal"); scorer = SampleCopaal(seed, sampleSize, namespaces, timeout)}
-            "copaal_rootmeansquare" -> scorer = Copaal(namespaces, timeout, "RootMeanSquare")
-            "samplecopaal_rootmeansquare" -> {println("[+] Using SampleCopaal[RootMeanSquare]"); scorer = SampleCopaal(seed, sampleSize, namespaces, timeout,"RootMeanSquare")}
-            "copaal_avgscore" -> scorer = Copaal(namespaces, timeout, "AverageScore")
-            "samplecopaal_avgscore" -> {println("[+] Using SampleCopaal[AvgScore]"); scorer = SampleCopaal(seed, sampleSize, namespaces,timeout,"AverageScore")}
+            "copaal" -> scorer = Copaal(namespaces, timeout, arrayOf<String>("AUC", "RootMeanSquare", "AverageScore"))
+            "samplecopaal" -> {println("[+] Using SampleCopaal"); scorer = SampleCopaal(seed, sampleSize, namespaces, timeout, arrayOf<String>("AUC", "RootMeanSquare", "AverageScore"))}
+            "copaal_rootmeansquare" -> scorer = Copaal(namespaces, timeout, arrayOf<String>("RootMeanSquare"))
+            "samplecopaal_rootmeansquare" -> {println("[+] Using SampleCopaal[RootMeanSquare]"); scorer = SampleCopaal(seed, sampleSize, namespaces, timeout, arrayOf<String>("RootMeanSquare"))}
+            "copaal_avgscore" -> scorer = Copaal(namespaces, timeout, arrayOf<String>("AverageScore"))
+            "samplecopaal_avgscore" -> {println("[+] Using SampleCopaal[AvgScore]"); scorer = SampleCopaal(seed, sampleSize, namespaces,timeout, arrayOf<String>("AverageScore"))}
         }
         return scorer
     }

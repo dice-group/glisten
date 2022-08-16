@@ -55,7 +55,7 @@ public class TestDataGenerator {
     private static final Node FALSE_NODE = NodeFactory.createLiteral("0.0", XSDDatatype.XSDdouble);
 
     public static void main(String[] args) throws Exception {
-        if (args.length < 2) {
+        if (args.length < 4) {
             System.err.println(
                     "Wrong number of arguments.\nUsage: TestDataGenerator <dataset-file> <pos-test-file> <output-file> <seed>");
             return;

@@ -1,6 +1,6 @@
 configurations:
   - name: "test_benchmark"
-    linksUrlZip: "file:///home/MichaelRoeder/glisten-data/"
+    linksUrlZip: "file:///path/to/links.zip"
     targetUrlZip: "file:///path/to/targets.zip"
     sources:
       - "file:///path/to/source1.nt"

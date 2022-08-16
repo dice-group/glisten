@@ -149,7 +149,7 @@ class CoreEvaluator(private val conf: Configuration, val params: EvaluationParam
      * @param recommendations the recommendation list, where each target dataset is annotated with a double value from -1 to 1, 1 ,means the dataset is very recommended.
      * @return the normalized AUC score
      */
-    fun getAUC(source: String, recommendations: MutableList<Pair<String, Double>>) : Double {
+    fun getAUCs(source: String, recommendations: MutableList<Pair<String, Double>>) : Double {
 
         //create source model and
         // download file from URL stream. (is in file:/// format if locally)
@@ -182,12 +182,18 @@ class CoreEvaluator(private val conf: Configuration, val params: EvaluationParam
         // normalize it
         //if we use the better ROC, we don't need to normalize anymore.
         //val normalizer = 1.0/(1-baseline)
-        val roc = getROC(baseline, source, facts, recommendations)
+        var aucs = emptyMap<String, ROCCurve>()
+        for((key, value) in baseline) {
+            var roc = getROC(value, source, facts, recommendations)
+            println("[+] ROC Curve created: $roc")
+            aucs.put(key)
+        }
+        //val roc = getROC(baseline.get("AUC"), source, facts, recommendations)
         //return normalizer*(roc.calculateAUC()-baseline)
 
         //val roc = getBetterROC(baseline, source, facts, recommendations)
-        println("[+] ROC Curve created: $roc")
-        return roc.calculateAUC()
+        //println("[+] ROC Curve created: $roc")
+        return rocs.calculateAUC()
     }
 
     /**
@@ -212,7 +218,7 @@ class CoreEvaluator(private val conf: Configuration, val params: EvaluationParam
      * @param recommendations the recommendation list, where each target dataset is annotated with a double value from -1 to 1, 1 ,means the dataset is very recommended.
      * @return The calculated [ROCCurve]
      */
-    fun getBetterROC(baseline : Double, source: String, facts: List<Pair<Statement, Double>>, recommendations: MutableList<Pair<String, Double>>): ROCCurve {
+    /* fun getBetterROC(baseline : Double, source: String, facts: List<Pair<Statement, Double>>, recommendations: MutableList<Pair<String, Double>>): ROCCurve {
         // sort recommendations, s.t. highest recommendation value is on top/first
         recommendations.sortByDescending { it.second }
         //We will store only the directions we want to go so we can calculate the upwards and rightwards steps in the ROC later
@@ -253,7 +259,7 @@ class CoreEvaluator(private val conf: Configuration, val params: EvaluationParam
             }
         }
         return roc
-    }
+    } */
 
     /**
      * This will calculate a normalized curve (ranging from 0.0 to 1.0 both on x and the y-Axis)
@@ -278,7 +284,7 @@ class CoreEvaluator(private val conf: Configuration, val params: EvaluationParam
      * @param recommendations the recommendation list, where each target dataset is annotated with a double value from -1 to 1, 1 ,means the dataset is very recommended.
      * @return The calculated [ROCCurve]
      */
-    fun getROC(baseline: Double, source: String, facts: List<Pair<Statement, Double>>, recommendations: MutableList<Pair<String, Double>>): ROCCurve{
+    fun getROC(baseline: Double, source: String, facts: List<Pair<Statement, Double>>, recommendations: MutableList<Pair<String, Double>>, scoreMethod: String): ROCCurve {
         recommendations.sortByDescending { it.second }
         //steps doesn't ,matter in our case, we don't know the first either way
         var maxSize = recommendations.size-1
@@ -294,7 +300,7 @@ class CoreEvaluator(private val conf: Configuration, val params: EvaluationParam
             }
             println("[*] Current dataset to add %s".format(dataset))
             val score = getScore(facts, source, listOf(dataset))
-            println("[+] %s added, Score: %f".format(dataset, score))
+            println("[+] %s added, Score: %s".format(dataset, score.toString()))
 
             roc.addPoint(counter/maxSize, score-baseline)
             counter += 1.0
@@ -316,7 +322,7 @@ class CoreEvaluator(private val conf: Configuration, val params: EvaluationParam
      * @param currentDataset the target dataset name, which link to the source will be added to the store. To use no dataset, use an empty string.
      * @return the AUC score of the Scorer algorithm
      */
-    fun getScore(facts: List<Pair<Statement, Double>>, sourceName: String, currentDataset: String) : Double{
+    fun getScore(facts: List<Pair<Statement, Double>>, sourceName: String, currentDataset: String) : Map<String, Double> {
         if(currentDataset.isNotEmpty()) {
             //(Download is in init)
             val linkdataset = "${File(params.linkedPath).toURI()}/" + sourceName.substringAfterLast("/")
@@ -341,7 +347,7 @@ class CoreEvaluator(private val conf: Configuration, val params: EvaluationParam
      * @param currentDatasets the target datasets name, which link to the source will be added to the store. To use no dataset, use an empty list.
      * @return the AUC score of the Scorer algorithm
      */
-    fun getScore(facts: List<Pair<Statement, Double>>, sourceName: String, currentDatasets: List<String>) : Double{
+    fun getScore(facts: List<Pair<Statement, Double>>, sourceName: String, currentDatasets: List<String>) : Map<String, Double> {
         currentDatasets.forEach { currentDataset ->
             //(Download is in init)
             val linkdataset = "${File(params.linkedPath).toURI()}/" + sourceName.substringAfterLast("/")

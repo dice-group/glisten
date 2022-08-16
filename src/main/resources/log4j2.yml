@@ -6,7 +6,7 @@ Configuration:
       name: filename
       value: glisten.log
   thresholdFilter:
-    level: debug
+    level: info
   appenders:
     Console:
       name: STDOUT
@@ -14,6 +14,9 @@ Configuration:
       PatternLayout:
         Pattern: "%highlight{%d [%t] %p [%c] - <%m>%n}{FATAL=red blink, ERROR=red, WARN=yellow bold, INFO=green, DEBUG=green bold, TRACE=blue}"
         disableAnsi: false
+      Filters:
+        ThresholdFilter:
+          level: info
     File:
       name: File
       fileName: ${filename}
@@ -21,7 +24,7 @@ Configuration:
         Pattern: "%d [%t] %p [%c] - <%m>%n"
       Filters:
         ThresholdFilter:
-          level: debug
+          level: info
 
   Loggers:
     logger:
@@ -63,7 +66,7 @@ Configuration:
           - ref: File
 
     Root:
-      level: debug
+      level: info
       AppenderRef:
         - ref: STDOUT
         - ref: File

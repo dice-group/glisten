@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit
  * @param timeout the timeout in seconds to use
  * @param scoreMethod  The score method to use. [AUC, RootMeanSqrt, AverageScore]. Default is AUC.
  */
-open class Copaal(namespaces: List<String>, timeout: Long, scoreMethod : String = "AUC") : Scorer(namespaces, timeout, scoreMethod){
+open class Copaal(namespaces: List<String>, timeout: Long, scoreMethods: Array<String> = arrayOf<String>("AUC")) : Scorer(namespaces, timeout, scoreMethods){
 
     /**
      * Creates a COPAAL [PathBasedFactChecker] using an [QueryExecutionFactoryHttp] with a delay of 200ms and a timeout of 30s
