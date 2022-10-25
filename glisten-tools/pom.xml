@@ -41,7 +41,7 @@
         <dependency>
             <groupId>org.dice-research.fc</groupId>
             <artifactId>copaal</artifactId>
-            <version>0.3.0-glisten</version>
+            <version>0.3.0-glisten-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.aksw.jena-sparql-api</groupId>
