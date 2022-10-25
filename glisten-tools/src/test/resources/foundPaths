@@ -1,0 +1,25 @@
+[ {
+  "score" : "NaN",
+  "evidence" : "<http://dbpedia.org/property/imageLink>/^<http://dbpedia.org/property/imageSize>/<http://dbpedia.org/property/publisher>",
+  "verbalization" : null
+}, {
+  "score" : "NaN",
+  "evidence" : "<http://dbpedia.org/property/system>/^<http://dbpedia.org/property/date>/<http://dbpedia.org/property/publisher>",
+  "verbalization" : null
+}, {
+  "score" : "NaN",
+  "evidence" : "<http://dbpedia.org/property/skills>/^<http://dbpedia.org/property/skills>/<http://dbpedia.org/property/publisher>",
+  "verbalization" : null
+}, {
+  "score" : "NaN",
+  "evidence" : "<http://dbpedia.org/property/strategy>/^<http://dbpedia.org/property/strategy>/<http://dbpedia.org/ontology/manufacturer>",
+  "verbalization" : null
+}, {
+  "score" : "NaN",
+  "evidence" : "<http://dbpedia.org/property/system>/^<http://dbpedia.org/property/title>/<http://dbpedia.org/ontology/publisher>",
+  "verbalization" : null
+}, {
+  "score" : "NaN",
+  "evidence" : "<http://dbpedia.org/ontology/designer>/^<http://dbpedia.org/property/designer>/<http://dbpedia.org/ontology/manufacturer>",
+  "verbalization" : null
+} ]

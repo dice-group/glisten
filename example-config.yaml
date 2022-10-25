@@ -1,0 +1,19 @@
+configurations:
+  - name: "test_benchmark"
+    linksUrlZip: "file:///home/MichaelRoeder/glisten-data/"
+    targetUrlZip: "file:///path/to/targets.zip"
+    sources:
+      - "file:///path/to/source1.nt"
+    trueStmtDrawerOpt:
+      stmtDrawerType: "allowlist"
+      list:
+        - "http://dbpedia.org/ontology/mythology"
+        - "http://dbpedia.org/ontology/creator"
+    falseStmtDrawerOpt:
+      stmtDrawerType: "allowlist"
+      list:
+        - "http://dbpedia.org/ontology/mythology"
+        - "http://dbpedia.org/ontology/creator"
+    namespaces:
+      - "http://dbpedia.org/ontology/"
+      - "http://dbpedia.org/properties/"
